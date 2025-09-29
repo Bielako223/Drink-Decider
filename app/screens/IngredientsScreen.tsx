@@ -1,0 +1,148 @@
+import React, { useState, useContext, useEffect } from 'react';
+import { FlatList, Text, TouchableOpacity, View, SafeAreaView, Pressable } from 'react-native';
+import { useRoute, RouteProp } from "@react-navigation/native";
+import styles from '../styles';
+import { useTranslation } from 'react-i18next';
+import { BaseItem } from '../DataManagment/Classes';
+import { GetIngredients } from '../DataManagment/DataAccess';
+import { ThemeContext } from "../../ThemeContext";
+import Ionicons from 'react-native-vector-icons/Ionicons';
+
+const IngredientsScreen = ({ navigation }: { navigation: any }) => {
+  const { t } = useTranslation();
+  const themeContext = useContext(ThemeContext);
+  if (!themeContext) return null;
+  const { theme } = themeContext;
+
+  const [ingredients, setIngredients] = useState<BaseItem[]>([]);
+  const [selectedItems, setSelectedItems] = useState<number[]>([]);
+
+  // Route params
+  let route: RouteProp<{ params: { taste: number[]; alcohols: number[]; strength: number } }, 'params'> = useRoute();
+  const taste = route.params?.taste;
+  const alcohols = route.params?.alcohols;
+  const strength = route.params?.strength;
+
+  // Pobierz składniki z bazy
+  useEffect(() => {
+    (async () => {
+      try {
+        const lang = t('Lang') === 'pl' ? 'pl' : 'eng';
+        const data = await GetIngredients(lang);
+        data.sort((a, b) => a.name.localeCompare(b.name));
+        setIngredients(data);
+      } catch (err) {
+        console.error("Błąd przy pobieraniu składników:", err);
+      }
+    })();
+  }, [t]);
+
+  const handleSelect = (id: number) => {
+    if (selectedItems.includes(id)) {
+      setSelectedItems(selectedItems.filter(item => item !== id));
+    } else {
+      setSelectedItems([...selectedItems, id]);
+    }
+  };
+
+  const renderItem = ({ item }: { item: BaseItem }) => {
+  const isSelected = selectedItems.includes(item.id);
+
+  return (
+    <View
+      style={{
+        flexDirection: "row",
+        marginHorizontal: 16,
+        marginVertical: 8,
+        overflow: "hidden",
+        alignItems: "center",
+      }}
+    >
+      {/* LEWA CZĘŚĆ */}
+      <TouchableOpacity
+        onPress={() => handleSelect(item.id)}
+        style={[
+          styles.item,
+          theme === "dark" ? styles.buttonDarkMode : styles.buttonWhiteMode,
+          isSelected &&
+            (theme === "dark"
+              ? styles.bgButtonSelectedColorDarkMode
+              : styles.bgbuttonSelectedColorWhiteMode),
+          {
+            flex: 1,
+            borderRadius: 20,
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+          },
+        ]}
+      >
+        {/* Tekst */}
+        <Text
+          style={[styles.itemText, theme === "dark" ? styles.fontColorDarkMode: styles.fontColorWhiteMode, { flexShrink: 1 }]}
+          numberOfLines={1}
+          ellipsizeMode="tail"
+        >
+          {item.name}
+        </Text>
+
+        {/* Ikonka info */}
+        {item.desc && (
+           <Pressable
+              onPress={() => alert(item.desc)}
+              style={{
+                marginLeft: 8,
+                backgroundColor: theme === "dark" ? "#444" : "#e0e0e0",
+                borderRadius: 50,
+                padding: 7, // zwiększa obszar dotyku
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Ionicons
+                name="information-circle-outline"
+                size={25}
+                color={theme === "dark" ? "white" : "black"}
+              />
+            </Pressable>
+        )}
+      </TouchableOpacity>
+    </View>
+  );
+};
+
+  return (
+    <SafeAreaView style={[styles.container, theme === "dark" ? styles.bgColorDarkMode : styles.bgColorWhiteMode]}>
+      <Text style={[styles.topText1, theme === "dark" ? styles.fontColorDarkMode : styles.fontColorWhiteMode]}>
+        {t('IngredientsText1')}{"\n"}<Text>{t('IngredientsText2')}</Text>{t('IngredientsText3')}
+      </Text>
+
+      <FlatList
+        style={styles.bottomSpace}
+        data={ingredients}
+        renderItem={renderItem}
+        keyExtractor={item => item.id.toString()}
+        extraData={selectedItems}
+      />
+
+      <View>
+        <Pressable
+          style={[styles.button, theme === "dark" ? styles.bottomButtonDarkMode : styles.bottomButtonWhiteMode]}
+          onPress={() => navigation.goBack()}
+        >
+          <Text style={[theme === "dark" ? styles.buttonText : styles.buttonTextWhiteMode]}>{t('ButtonTextBack')}</Text>
+        </Pressable>
+
+        <Pressable
+          style={[styles.button2, theme === "dark" ? styles.bottomButtonDarkMode : styles.bottomButtonWhiteMode]}
+          
+          onPress={() => navigation.navigate("Drink", { taste, strength, alcohols, ingredients: selectedItems })}
+        >
+          <Text style={[theme === "dark" ? styles.buttonText : styles.buttonTextWhiteMode]}>{t('ButtonTextNext')}</Text>
+        </Pressable>
+      </View>
+    </SafeAreaView>
+  );
+};
+
+export default IngredientsScreen;

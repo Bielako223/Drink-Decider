@@ -12,7 +12,6 @@ import DrinkListScreen from './app/screens/DrinkListScreen';
 import MyIngredientsAlcoholScreen from './app/screens/MyIngredientsAlcoholScreen';
 import MyIngredientsIngredientsScreen from './app/screens/MyIngredientsIngredientsScreen';
 import MyIngredientsResutScreen from './app/screens/MyIngredientsResutScreen';
-import DrinkDetailsScreen from './app/screens/DrinkDetailsScreen';
 import WelcomeScreen from './app/screens/MyIngredientsInstruction';
 import { I18nextProvider } from 'react-i18next';
 import i18next from './services/i18next';
@@ -48,7 +47,6 @@ function AppContent() {
           <Stack.Screen name="MyIngredientsIngredients" component={MyIngredientsIngredientsScreen} options={{ headerShown: false }} />
           <Stack.Screen name="MyIngredientsResut" component={MyIngredientsResutScreen} options={{ headerShown: false }} />
           <Stack.Screen name="WelcomeScreen" component={WelcomeScreen} options={{ headerShown: false }} />
-          <Stack.Screen name="DrinkDetails" component={DrinkDetailsScreen} options={{ headerShown: false }} />
 
         </Stack.Navigator>
       </NavigationContainer>

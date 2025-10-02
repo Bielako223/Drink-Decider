@@ -3,7 +3,6 @@ import {
   FlatList,
   Text,
   TouchableOpacity,
-  SafeAreaView,
   Pressable,
   View,
 } from "react-native";
@@ -12,6 +11,8 @@ import styles from "../styles";
 import { useTranslation } from "react-i18next";
 import { BaseItem } from "../DataManagment/Classes";
 import { GetStrength } from "../DataManagment/DataAccess";
+import { SafeAreaView } from "react-native-safe-area-context"; // nowa wersja
+
 import { ThemeContext } from "../../ThemeContext";
 
 const StrengthScreen = ({ navigation }: { navigation: any }) => {

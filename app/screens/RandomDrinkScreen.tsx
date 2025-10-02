@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { SafeAreaView, ScrollView, Text, Pressable, View } from 'react-native';
+import { ScrollView, Text, Pressable, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import styles from '../styles';
 import { ThemeContext } from "../../ThemeContext";
 import DrinkItem from '../DrinkItem';
 import { GetRandomDrink } from '../DataManagment/DataAccess';
 import { DrinkFull } from '../DataManagment/Classes';
+import { SafeAreaView } from "react-native-safe-area-context"; // nowa wersja
+
 
 function RandomDrinkScreen({ navigation }: { navigation: any }) {
   const { t } = useTranslation();

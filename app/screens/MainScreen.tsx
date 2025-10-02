@@ -1,11 +1,13 @@
 import React, { useContext } from 'react';
-import { Text, View, Image, SafeAreaView, Pressable } from 'react-native';
+import { Text, View, Image, Pressable } from 'react-native';
 import { useRoute } from "@react-navigation/native";
 import styles from '../styles';
 import { useTranslation } from 'react-i18next';
 import ChangeLang from '../ChangeLanguage';
 import { ThemeContext } from "../../ThemeContext";
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { SafeAreaView } from "react-native-safe-area-context"; // nowa wersja
+
 
 function MainScreen({ navigation }: { navigation: any }) {
   let route = useRoute();

@@ -49,5 +49,7 @@
     "skladnik" : " ingredients.",
     "favorites": "Favorites",
     "Showall": "Show all",
-    "drinksfromyoursingredients": "Drinks with your ingredients:"
+    "drinksfromyoursingredients": "Drinks with your ingredients:",
+        "Warning": "Warning"
+
 }

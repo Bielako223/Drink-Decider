@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { SafeAreaView, FlatList, TextInput, View, Text, Pressable } from 'react-native';
+import { FlatList, TextInput, View, Text, Pressable } from 'react-native';
 import DrinkItemSimple from '../DrinkItemSimple';
 import DrinkItem from '../DrinkItem';
 import { DrinkSimple, DrinkFull } from '../DataManagment/Classes';
@@ -7,8 +7,10 @@ import { GetDrinksBasic, GetDrinkById } from '../DataManagment/DataAccess';
 import { ThemeContext } from '../../ThemeContext';
 import styles from '../styles';
 import { useTranslation } from 'react-i18next';
-import Icon from "react-native-vector-icons/FontAwesome";
+import { FontAwesome } from "@expo/vector-icons";
 import { useFavorites } from "../FavoriteContext";
+import { SafeAreaView } from "react-native-safe-area-context"; // nowa wersja
+
 
 function DrinkListScreen({ navigation }: { navigation: any }) {
   const { t } = useTranslation();
@@ -85,7 +87,7 @@ function DrinkListScreen({ navigation }: { navigation: any }) {
 }}
         onPress={() => setShowFavorites(prev => !prev)}
       >
-        <Icon name="heart" size={16} color="white" style={{ marginRight: 6 }} />
+        <FontAwesome name="heart" size={16} color="white" style={{ marginRight: 6 }} />
         <Text style={{ color: "white" }}>{showFavorites ? t('Showall') : t('favorites')}</Text>
       </Pressable>
 

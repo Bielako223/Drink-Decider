@@ -16,7 +16,8 @@ const styles = StyleSheet.create({
     buttonDarkMode: {
   borderWidth: 1.5,
   borderColor: 'white',
-  backgroundColor: 'black',
+  backgroundColor: '#050712',
+  overflow: 'visible',
 
   // cień iOS
   shadowColor: 'white',
@@ -60,7 +61,7 @@ textcolorWhiteMode:{
       color:'white'
     },
     bgbuttonSelectedColorWhiteMode:{
-      backgroundColor: '#e6e6e6',
+      backgroundColor: '#d6c9c9ff',
       color:'white'
     },
     bottomButtonDarkMode:{
@@ -128,7 +129,6 @@ textcolorWhiteMode:{
       borderRadius:20,
       alignItems: 'center',
       justifyContent: 'center',
-      borderRightColor:'black',
     },
     button2: {
       position: 'absolute',
@@ -149,6 +149,7 @@ textcolorWhiteMode:{
       fontSize: 18,
       textAlign: 'center',
       fontFamily: 'Poppins_500Medium'
+      
     },
     topBlock:{
       position: 'absolute',
@@ -179,7 +180,6 @@ textcolorWhiteMode:{
       fontWeight: '500',
     },
     boldText1:{
-      fontWeight: 'bold',
       textDecorationLine: 'underline',
       fontSize:25,
       color: 'red'
@@ -205,11 +205,9 @@ textcolorWhiteMode:{
     startButton: {
   width: '64%',
   padding: 15,
-  paddingBottom:14,
   borderRadius: 15,
   alignItems: 'center',
   justifyContent: 'center',
-  borderRightColor: 'black',
   marginBottom: 25,
 
    // iOS
@@ -429,20 +427,20 @@ drinkCard: {
   margin: 16,
   borderRadius: 20,
   backgroundColor: '#fff',
-  overflow: 'hidden',
 
-  // Cień tylko pod całością
+ // Cień iOS
   shadowColor: '#000',
   shadowOffset: { width: 0, height: 4 },
   shadowOpacity: 0.15,
   shadowRadius: 6,
+
+  // Cień Android
   elevation: 5,
 },
 drinkCardDark: {
   margin: 16,
   borderRadius: 20,
-  backgroundColor: '#1a1a1a', // ciemne tło
-  overflow: 'hidden',
+  backgroundColor: '#050712', // ciemne tło
 
   // Cień tylko pod całością
   shadowColor: '#000',
@@ -456,14 +454,19 @@ drinkCardDark: {
 
 imageContainer: {
   width: '100%',
-  height: 210, // 1/3 wysokości przykładowego elementu
+  height: 210,
   position: 'relative',
+  borderTopLeftRadius: 20,
+  borderTopRightRadius: 20,
+  overflow: 'hidden', // konieczne, żeby obrazek trzymał się kształtu
 },
 
 drinkImage: {
   width: '100%',
   height: '100%',
   resizeMode: 'cover',
+  borderTopLeftRadius: 20,
+  borderTopRightRadius: 20,
 },
 
 imageGradient: {

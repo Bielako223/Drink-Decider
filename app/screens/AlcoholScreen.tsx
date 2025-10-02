@@ -1,12 +1,16 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { FlatList, Text, TouchableOpacity, View, SafeAreaView, Pressable } from 'react-native';
+import { FlatList, Text, TouchableOpacity, View, Pressable,Alert } from 'react-native';
+import { SafeAreaView } from "react-native-safe-area-context"; // nowa wersja
+
 import { useRoute, RouteProp } from "@react-navigation/native";
 import styles from '../styles';
 import { useTranslation } from 'react-i18next';
 import { BaseItem } from '../DataManagment/Classes';
 import { GetAlcohol } from '../DataManagment/DataAccess';
 import { ThemeContext } from "../../ThemeContext";
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import { Ionicons } from "@expo/vector-icons";
+import SimplePopup from '../SimplePopup';
+
 
 
 const AlcoholScreen = ({ navigation }: { navigation: any }) => {
@@ -23,6 +27,9 @@ const AlcoholScreen = ({ navigation }: { navigation: any }) => {
   // State
   const [alcohol, setAlcohol] = useState<BaseItem[]>([]);
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
+  const [popupVisible, setPopupVisible] = useState(false);
+const [popupTitle, setPopupTitle] = useState("");
+const [popupMessage, setPopupMessage] = useState("");
 
   // Load alcohol list
   useEffect(() => {
@@ -91,22 +98,26 @@ const AlcoholScreen = ({ navigation }: { navigation: any }) => {
         {/* Ikonka info */}
         {hasDesc && (
   <Pressable
-    onPress={() => alert(item.desc)}
-    style={{
-      marginLeft: 8,
-      backgroundColor: theme === "dark" ? "#444" : "#e0e0e0",
-      borderRadius: 50,
-      padding: 7, // zwiększa obszar dotyku
-      justifyContent: "center",
-      alignItems: "center",
-    }}
-  >
-    <Ionicons
-      name="information-circle-outline"
-      size={25}
-      color={theme === "dark" ? "white" : "black"}
-    />
-  </Pressable>
+  onPress={() => {
+    setPopupTitle(item.name);          // np. nagłówek popupu = nazwa alkoholu
+    setPopupMessage(item.desc ?? "");  // treść popupu = opis
+    setPopupVisible(true);
+  }}
+  style={{
+    marginLeft: 8,
+    backgroundColor: theme === "dark" ? "#444" : "#e0e0e0",
+    borderRadius: 50,
+    padding: 7,
+    justifyContent: "center",
+    alignItems: "center",
+  }}
+>
+  <Ionicons
+    name="information-circle-outline"
+    size={25}
+    color={theme === "dark" ? "white" : "black"}
+  />
+</Pressable>
 )}
 
 
@@ -168,6 +179,12 @@ const AlcoholScreen = ({ navigation }: { navigation: any }) => {
           <Text style={[theme === "dark" ? styles.buttonText : styles.buttonTextWhiteMode]}>{t('ButtonTextNext')}</Text>
         </Pressable>
       </View>
+      <SimplePopup
+  isVisible={popupVisible}
+  onClose={() => setPopupVisible(false)}
+  title={popupTitle}
+  message={popupMessage}
+/>
     </SafeAreaView>
   );
 };

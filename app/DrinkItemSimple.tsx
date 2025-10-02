@@ -3,9 +3,9 @@ import { Pressable, View, Text, Image, StyleSheet } from 'react-native';
 import { DrinkSimple } from './DataManagment/Classes';
 import Images from './DataManagment/Images';
 import { useFavorites } from "./FavoriteContext";
-import Icon from "react-native-vector-icons/FontAwesome";
 import { ThemeContext } from "../ThemeContext";
 import { useTranslation } from 'react-i18next';
+import { FontAwesome} from "@expo/vector-icons";
 
 
 
@@ -53,7 +53,7 @@ const DrinkItemSimpleComponent: React.FC<Props> = ({ drink, onPress, matchPercen
         {/* ❤️ Serce wycentrowane pionowo po prawej */}
         <View style={styles.heartContainerItemSimple}>
           <Pressable onPress={() => toggleFavorite(drink.id)}>
-            <Icon
+            <FontAwesome
               name={favorite ? "heart" : "heart-o"}
               size={26}
               color={favorite ? "red" : "gray"}
@@ -102,7 +102,7 @@ const styles = StyleSheet.create({
   marginVertical: 6,
   padding: 12,
   borderRadius: 12,
-  backgroundColor: 'black', // ciemne tło
+  backgroundColor: '#050712', // ciemne tło
   borderWidth: 1,
   borderColor: '#333',       // ciemniejsza ramka
   shadowColor: '#000',

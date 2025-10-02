@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import { Text, View, SafeAreaView, ScrollView, Pressable } from "react-native";
+import { Text, View, ScrollView, Pressable } from "react-native";
 import { useRoute, RouteProp } from "@react-navigation/native";
 import styles from "../styles";
 import { useTranslation } from "react-i18next";
@@ -8,6 +8,8 @@ import { MyIngredientsGetDrinks } from "../DataManagment/DataAccess";
 import { ThemeContext } from "../../ThemeContext";
 import DrinkItem from "../DrinkItem";
 import DrinkItemSimple from "../DrinkItemSimple";
+import { SafeAreaView } from "react-native-safe-area-context"; // nowa wersja
+
 
 function MyIngredientsResutScreen({ navigation }: { navigation: any }) {
   const { t } = useTranslation();

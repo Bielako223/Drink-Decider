@@ -1,10 +1,13 @@
 import React, {useContext} from 'react';
-import { View, Text, StyleSheet, Pressable, SafeAreaView } from 'react-native';
+import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import styles from '../styles';
 import { ThemeContext } from "../../ThemeContext";
 import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
-import MaterialCommunityIconsIcon from 'react-native-vector-icons/MaterialCommunityIcons';
+import {MaterialCommunityIcons } from "@expo/vector-icons";
+import { SafeAreaView } from "react-native-safe-area-context"; // nowa wersja
+
+
 const WelcomeScreen = ({ navigation }: { navigation: any }) => {
     const { t } = useTranslation();
     const themeContext = useContext(ThemeContext);
@@ -22,11 +25,11 @@ const WelcomeScreen = ({ navigation }: { navigation: any }) => {
             <Text style={[styles.instructionTextList, theme === "dark" ? styles.fontColorDarkMode : styles.fontColorWhiteMode]}>{t('Step3')}</Text>
             <View style={styles.iconscontainer}>
             <Text style={[styles.iconstext, theme === "dark" ? styles.fontColorDarkMode : styles.fontColorWhiteMode]}>
-            <MaterialCommunityIconsIcon name="liquor" size={50} color={theme === "dark" ? "white" : "black"} />
+            <MaterialCommunityIcons name="liquor" size={50} color={theme === "dark" ? "white" : "black"} />
             {'\u00A0'}+{'\u00A0'}
             <FontAwesome5Icon name="lemon" size={50} color="#FFC107" />
-            <MaterialCommunityIconsIcon name="fruit-cherries" size={50} color="red" />
-            <MaterialCommunityIconsIcon name="leaf" size={50} color="green" />
+            <MaterialCommunityIcons name="fruit-cherries" size={50} color="red" />
+            <MaterialCommunityIcons name="leaf" size={50} color="green" />
             {'\u00A0'}={'\u00A0'}
             <FontAwesome5Icon name="glass-martini-alt" size={50} color={theme === "dark" ? "white" : "black"} />
             </Text>

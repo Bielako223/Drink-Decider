@@ -5,7 +5,8 @@ import { useTranslation } from 'react-i18next';
 import { ThemeContext } from "../ThemeContext";
 import Images from './DataManagment/Images';
 import { DrinkFull } from './DataManagment/Classes';
-import Icon from 'react-native-vector-icons/FontAwesome';
+import { FontAwesome } from "@expo/vector-icons";
+
 import styles from './styles';
 import Popup from './Popup';
 import { useFavorites } from "./FavoriteContext";
@@ -31,7 +32,7 @@ const DrinkItemComponent: React.FC<Props> = ({ drink, onPress, matchPercentage, 
 
   return (
     <TouchableOpacity onPress={onPress} activeOpacity={0.9}>
-      <View style={[theme === "dark" ? styles.drinkCardDark: styles.drinkCard, theme === "dark" ? styles.drinkDarkMode : styles.drinkWhiteMode]}>
+      <View style={[theme === "dark" ? styles.drinkCardDark: styles.drinkCard]}>
         
         {/* --- Obrazek --- */}
         <View style={styles.imageContainer}>
@@ -97,7 +98,7 @@ const DrinkItemComponent: React.FC<Props> = ({ drink, onPress, matchPercentage, 
           </View>
 
           <TouchableOpacity style={styles.recipeButton} onPress={() => setPopupVisible(true)}>
-           <Icon name="book" size={20} color={theme === "dark" ? "white" : "black"} />
+           <FontAwesome name="book" size={20} color={theme === "dark" ? "white" : "black"} />
 
             <Text style={[theme === "dark" ? styles.buttonText : styles.buttonTextWhiteMode]}>{t('Recipe')}</Text>
           </TouchableOpacity>
@@ -115,7 +116,7 @@ const DrinkItemComponent: React.FC<Props> = ({ drink, onPress, matchPercentage, 
           onPress={() => toggleFavorite(drink.id)}
           style={styles.heartContainerDrinkItem}
         >
-          <Icon name={favorite ? "heart" : "heart-o"} size={25} color={favorite ? "red" : "white"} />
+          <FontAwesome name={favorite ? "heart" : "heart-o"} size={25} color={favorite ? "red" : "white"} />
         </Pressable>
       </View>
     </TouchableOpacity>

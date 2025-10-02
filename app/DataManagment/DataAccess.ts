@@ -3,14 +3,19 @@ import { openDatabase } from './db';
 
 let dbInstance: any = null;
 let currentLang: 'pl' | 'eng' | null = null;
+let dbInitializing: Promise<any> | null = null;
 
 async function getDb(lang: 'pl' | 'eng') {
-  if (dbInstance && currentLang === lang) {
-    return dbInstance;
+  if (dbInstance && currentLang === lang) return dbInstance;
+
+  if (!dbInitializing) {
+    const dbName = lang === 'pl' ? 'drinks.db' : 'drinksEng.db';
+    dbInitializing = openDatabase(dbName);
   }
-  const dbName = lang === 'pl' ? 'drinks.db' : 'drinksEng.db';
-  dbInstance = await openDatabase(dbName);
+
+  dbInstance = await dbInitializing;
   currentLang = lang;
+  dbInitializing = null;
   return dbInstance;
 }
 
@@ -24,7 +29,7 @@ export async function GetTaste(lang: 'pl' | 'eng'): Promise<BaseItem[]> {
   try {
     const db = await getDb(lang);
     const rows: BaseRow[] = await db.getAllAsync('SELECT id, name, NULL as desc FROM taste');
-    return rows.map(row => new BaseItem(row.id, row.name));
+    return rows.map(r => new BaseItem(r.id, r.name));
   } catch (err) {
     console.error('Błąd przy GetTaste:', err);
     return [];
@@ -35,7 +40,7 @@ export async function GetStrength(lang: 'pl' | 'eng'): Promise<BaseItem[]> {
   try {
     const db = await getDb(lang);
     const rows: BaseRow[] = await db.getAllAsync('SELECT id, name, NULL as desc FROM strength');
-    return rows.map(row => new BaseItem(row.id, row.name));
+    return rows.map(r => new BaseItem(r.id, r.name));
   } catch (err) {
     console.error('Błąd przy GetStrength:', err);
     return [];
@@ -46,7 +51,7 @@ export async function GetIngredients(lang: 'pl' | 'eng'): Promise<BaseItem[]> {
   try {
     const db = await getDb(lang);
     const rows: BaseRow[] = await db.getAllAsync('SELECT id, name, description FROM ingredients');
-    return rows.map(row => new BaseItem(row.id, row.name, row.description));
+    return rows.map(r => new BaseItem(r.id, r.name, r.description));
   } catch (err) {
     console.error('Błąd przy GetIngredients:', err);
     return [];
@@ -56,12 +61,8 @@ export async function GetIngredients(lang: 'pl' | 'eng'): Promise<BaseItem[]> {
 export async function GetAlcohol(lang: 'pl' | 'eng'): Promise<BaseItem[]> {
   try {
     const db = await getDb(lang);
-const rows: BaseRow[] = await db.getAllAsync('SELECT id, name, description FROM alcohol');
-const ret = rows.map(row => new BaseItem(row.id, row.name, row.description));
-console.log('GetAlcohol zwróciło:', ret[0]);
-return ret;
-
-
+    const rows: BaseRow[] = await db.getAllAsync('SELECT id, name, description FROM alcohol');
+    return rows.map(r => new BaseItem(r.id, r.name, r.description));
   } catch (err) {
     console.error('Błąd przy GetAlcohol:', err);
     return [];

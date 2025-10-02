@@ -4,7 +4,7 @@ import {
   Text,
   TouchableOpacity,
   View,
-  SafeAreaView,
+  
   Pressable,
 } from "react-native";
 import { useTranslation } from "react-i18next";
@@ -12,7 +12,12 @@ import styles from "../styles";
 import { BaseItem } from "../DataManagment/Classes";
 import { GetAlcohol } from "../DataManagment/DataAccess";
 import { ThemeContext } from "../../ThemeContext";
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import { Ionicons } from "@expo/vector-icons";
+import { SafeAreaView } from "react-native-safe-area-context"; // nowa wersja
+import SimplePopup from '../SimplePopup'; // dostosuj ścieżkę
+
+
+
 
 
 const MyIngredientsAlcoholScreen = ({ navigation }: { navigation: any }) => {
@@ -23,6 +28,10 @@ const MyIngredientsAlcoholScreen = ({ navigation }: { navigation: any }) => {
 
   const [alcohol, setAlcohol] = useState<BaseItem[]>([]);
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
+  const [popupVisible, setPopupVisible] = useState(false);
+const [popupTitle, setPopupTitle] = useState("");
+const [popupMessage, setPopupMessage] = useState("");
+
 
   // pobranie danych z bazy
   useEffect(() => {
@@ -90,22 +99,27 @@ const MyIngredientsAlcoholScreen = ({ navigation }: { navigation: any }) => {
         {/* Ikonka info */}
         {hasDesc && (
   <Pressable
-    onPress={() => alert(item.desc)}
-    style={{
-      marginLeft: 8,
-      backgroundColor: theme === "dark" ? "#444" : "#e0e0e0",
-      borderRadius: 50,
-      padding: 7, // zwiększa obszar dotyku
-      justifyContent: "center",
-      alignItems: "center",
-    }}
-  >
-    <Ionicons
-      name="information-circle-outline"
-      size={25}
-      color={theme === "dark" ? "white" : "black"}
-    />
-  </Pressable>
+  onPress={() => {
+    setPopupTitle(item.name);          // nagłówek = nazwa składnika
+    setPopupMessage(item.desc ?? "");  // treść = opis
+    setPopupVisible(true);
+  }}
+  style={{
+    marginLeft: 8,
+    backgroundColor: theme === "dark" ? "#444" : "#e0e0e0",
+    borderRadius: 50,
+    padding: 7,
+    justifyContent: "center",
+    alignItems: "center",
+  }}
+>
+  <Ionicons
+    name="information-circle-outline"
+    size={25}
+    color={theme === "dark" ? "white" : "black"}
+  />
+</Pressable>
+
 )}
 
 
@@ -170,6 +184,13 @@ const MyIngredientsAlcoholScreen = ({ navigation }: { navigation: any }) => {
           <Text style={[theme === "dark" ? styles.buttonText : styles.buttonTextWhiteMode]}>{t("ButtonTextNext")}</Text>
         </Pressable>
       </View>
+      <SimplePopup
+  isVisible={popupVisible}
+  onClose={() => setPopupVisible(false)}
+  title={popupTitle}
+  message={popupMessage}
+/>
+
     </SafeAreaView>
   );
 };

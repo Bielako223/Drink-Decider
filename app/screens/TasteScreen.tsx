@@ -1,18 +1,12 @@
 import React, { useState, useContext, useEffect } from "react";
-import {
-  FlatList,
-  Text,
-  TouchableOpacity,
-  SafeAreaView,
-  View,
-  Pressable,
-  Alert,
-} from "react-native";
+import { FlatList, Text, TouchableOpacity, View, Pressable } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context"; // nowa wersja
 import styles from "../styles";
 import { useTranslation } from "react-i18next";
 import { BaseItem } from "../DataManagment/Classes"; 
 import { GetTaste } from "../DataManagment/DataAccess";
 import { ThemeContext } from "../../ThemeContext";
+import SimplePopup from "../SimplePopup";
 
 const TasteScreen = ({ navigation }: { navigation: any }) => {
   const { t } = useTranslation();
@@ -21,14 +15,16 @@ const TasteScreen = ({ navigation }: { navigation: any }) => {
   const { theme } = themeContext;
 
   const [taste, setTaste] = useState<BaseItem[]>([]);
-  const [selectedItems, setSelectedItems] = useState<number[]>([]); // tylko ID
+  const [selectedItems, setSelectedItems] = useState<number[]>([]);
+  const [popupVisible, setPopupVisible] = useState(false);
+const [popupTitle, setPopupTitle] = useState(t('Warning'));
+const [popupMessage, setPopupMessage] = useState("");
 
-  // Pobieramy dane z bazy
   useEffect(() => {
     (async () => {
       try {
         const lang = t("Lang") === "pl" ? "pl" : "eng";
-        const data = await GetTaste(lang); // zwraca BaseItem[]
+        const data = await GetTaste(lang);
         setTaste(data);
       } catch (error) {
         console.error("Błąd przy wczytywaniu taste:", error);
@@ -38,50 +34,39 @@ const TasteScreen = ({ navigation }: { navigation: any }) => {
 
   const handleSelect = (id: number) => {
     if (selectedItems.includes(id)) {
-      setSelectedItems(selectedItems.filter((item) => item !== id));
+      setSelectedItems(selectedItems.filter(item => item !== id));
+    } else if (selectedItems.length < 2) {
+      setSelectedItems([...selectedItems, id]);
     } else {
-      if (selectedItems.length < 2) {
-        setSelectedItems([...selectedItems, id]);
-      } else {
-        Alert.alert(t("SelectTasteAlert"), "", [{ text: "OK" }]);
-      }
-    }
+  setPopupTitle(t("Warning")); // nagłówek popupu
+  setPopupMessage(t("SelectTasteAlert")); // treść popupu
+  setPopupVisible(true);
+}
   };
 
   const renderItem = ({ item }: { item: BaseItem }) => {
     const isSelected = selectedItems.includes(item.id);
-     return (
+    return (
       <View style={{ marginHorizontal: 16 }}>
         <TouchableOpacity
           onPress={() => handleSelect(item.id)}
           style={[
             styles.item,
             theme === "dark" ? styles.buttonDarkMode : styles.buttonWhiteMode,
-            isSelected &&
-              (theme === "dark"
-                ? styles.bgButtonSelectedColorDarkMode
-                : styles.bgbuttonSelectedColorWhiteMode),
+            isSelected && (theme === "dark" ? styles.bgButtonSelectedColorDarkMode : styles.bgbuttonSelectedColorWhiteMode)
           ]}
         >
-          <Text style={[styles.itemText, theme === "dark" ? styles.fontColorDarkMode: styles.fontColorWhiteMode]}>{item.name}</Text>
+          <Text style={[styles.itemText, theme === "dark" ? styles.fontColorDarkMode : styles.fontColorWhiteMode]}>
+            {item.name}
+          </Text>
         </TouchableOpacity>
       </View>
     );
   };
 
   return (
-    <SafeAreaView
-      style={[
-        styles.container,
-        theme === "dark" ? styles.bgColorDarkMode : styles.bgColorWhiteMode,
-      ]}
-    >
-      <Text
-        style={[
-          styles.topText,
-          theme === "dark" ? styles.fontColorDarkMode : styles.fontColorWhiteMode,
-        ]}
-      >
+    <SafeAreaView style={[styles.container, theme === "dark" ? styles.bgColorDarkMode : styles.bgColorWhiteMode]}>
+      <Text style={[styles.topText, theme === "dark" ? styles.fontColorDarkMode : styles.fontColorWhiteMode]}>
         {t("SelectTaste")}
       </Text>
 
@@ -89,19 +74,16 @@ const TasteScreen = ({ navigation }: { navigation: any }) => {
         style={styles.bottomSpace}
         data={taste}
         renderItem={renderItem}
-        keyExtractor={(item) => item.id.toString()}
+        keyExtractor={item => item.id.toString()}
         extraData={selectedItems}
       />
 
       <View>
         <Pressable
-          style={[
-            styles.button,
-            theme === "dark" ? styles.bottomButtonDarkMode : styles.bottomButtonWhiteMode,
-          ]}
+          style={[styles.button, theme === "dark" ? styles.bottomButtonDarkMode : styles.bottomButtonWhiteMode]}
           onPress={() => navigation.goBack()}
         >
-          <Text style={[theme === "dark" ? styles.buttonText : styles.buttonTextWhiteMode]}>{t("ButtonTextBack")}</Text>
+          <Text style={theme === "dark" ? styles.buttonText : styles.buttonTextWhiteMode}>{t("ButtonTextBack")}</Text>
         </Pressable>
 
         <Pressable
@@ -109,17 +91,19 @@ const TasteScreen = ({ navigation }: { navigation: any }) => {
           style={[
             styles.button2,
             theme === "dark" ? styles.bottomButtonDarkMode : styles.bottomButtonWhiteMode,
-            selectedItems.length === 0 && styles.button2off,
+            selectedItems.length === 0 && styles.button2off
           ]}
-          onPress={() =>
-            navigation.navigate("Strength", {
-              taste: selectedItems, // tylko ID (number[])
-            })
-          }
+          onPress={() => navigation.navigate("Strength", { taste: selectedItems })}
         >
-          <Text style={[theme === "dark" ? styles.buttonText : styles.buttonTextWhiteMode]}>{t("ButtonTextNext")}</Text>
+          <Text style={theme === "dark" ? styles.buttonText : styles.buttonTextWhiteMode}>{t("ButtonTextNext")}</Text>
         </Pressable>
       </View>
+      <SimplePopup
+  isVisible={popupVisible}
+  onClose={() => setPopupVisible(false)}
+  title={popupTitle}
+  message={popupMessage}
+/>
     </SafeAreaView>
   );
 };

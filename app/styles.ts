@@ -90,12 +90,33 @@ textcolorWhiteMode:{
   // cień Android
   elevation: 5,
 },
-    buttonTextWhiteMode:{
-      color: 'black',
-      fontSize: 18,
-      textAlign: 'center',
-      fontFamily: 'Poppins_500Medium'
-    },
+    buttonTextWhiteMode: {
+  color: 'black',
+  width: '100%',
+  flexShrink: 1,
+  flexWrap: 'wrap',
+  textAlign: 'center',
+  fontFamily: 'Poppins_500Medium',
+  fontSize: 18,
+  lineHeight: 22,
+  includeFontPadding: false,
+  letterSpacing: 0.3,
+  paddingHorizontal: 4,
+  paddingRight: 2, // 👈 zapas
+}, buttonTextWhiteMode1: {
+  color: 'black',
+  flexShrink: 1,
+  flexWrap: 'wrap',
+  textAlign: 'center',
+  fontFamily: 'Poppins_500Medium',
+  fontSize: 18,
+  lineHeight: 22,
+  includeFontPadding: false,
+  letterSpacing: 0.3,
+  paddingHorizontal: 4,
+  paddingRight: 2, // 👈 zapas
+},
+
     item: {
       padding: 20,
       marginVertical: 8,
@@ -117,7 +138,8 @@ textcolorWhiteMode:{
     },
     itemText: {
       fontSize: 18,
-      fontFamily: 'Poppins_500Medium'
+      fontFamily: 'Poppins_500Medium',
+      includeFontPadding: false
     },
     button: {
       position: 'absolute',
@@ -146,10 +168,30 @@ textcolorWhiteMode:{
       },
     buttonText: {
       color: 'white',
-      fontSize: 18,
-      textAlign: 'center',
-      fontFamily: 'Poppins_500Medium'
-      
+      width: '100%',
+  flexShrink: 1,
+  flexWrap: 'wrap',
+  textAlign: 'center',
+  fontFamily: 'Poppins_500Medium',
+  fontSize: 18,
+  lineHeight: 22,
+  includeFontPadding: false,
+  letterSpacing: 0.3,
+  paddingHorizontal: 4,
+  paddingRight: 2, // 👈 zapas
+    },
+    buttonText11: {
+      color: 'white',
+  flexShrink: 1,
+  flexWrap: 'wrap',
+  textAlign: 'center',
+  fontFamily: 'Poppins_500Medium',
+  fontSize: 18,
+  lineHeight: 22,
+  includeFontPadding: false,
+  letterSpacing: 0.3,
+  paddingHorizontal: 4,
+  paddingRight: 2, // 👈 zapas
     },
     topBlock:{
       position: 'absolute',
@@ -169,7 +211,8 @@ textcolorWhiteMode:{
       fontSize:22,
       margin:5,
       padding:5,
-      fontFamily: 'Poppins_500Medium'
+      fontFamily: 'Poppins_500Medium',
+      includeFontPadding: false,
     },
     topText1:{
       textAlign: 'center',
@@ -259,9 +302,11 @@ textcolorWhiteMode:{
     drinkTextBold:{
       fontFamily: 'Poppins_700Bold',
       fontSize: 17,
+      includeFontPadding: false,
     },
     popupListText:{
       fontFamily: 'Poppins_400Regular',
+      includeFontPadding: false,
     },
     helpText:{
       textAlign: 'center',
@@ -391,7 +436,8 @@ searchInput: {
 },instructionTextTop:{
   fontSize: 25,
   marginBottom: 30,
-  fontFamily: 'Poppins_700Bold'
+  fontFamily: 'Poppins_700Bold',
+      includeFontPadding: false,
 },
 instructionTextList:{
   fontSize: 20,
@@ -487,12 +533,14 @@ drinkName: {
   color: '#fff',
   fontSize: 20,
   fontFamily: 'Poppins_700Bold',
+      includeFontPadding: false,
 },
 
 drinkStrength: {
   color: '#CCCCCC',
   fontSize: 16,
   fontFamily: 'Poppins_500Medium',
+      includeFontPadding: false,
 },
 
 infoContainer: {
@@ -504,26 +552,30 @@ infoHeader: {
   marginTop: 10,
   marginBottom: 4,
   fontFamily: 'Poppins_500Medium',
+      includeFontPadding: false,
 },
 infoHeaderDark: {
   fontSize: 16,
   marginTop: 10,
   marginBottom: 4,
   fontFamily: 'Poppins_500Medium',
-  color: 'white'
+  color: 'white',
+      includeFontPadding: false,
 },
 
 infoContent: {
   fontSize: 14,
   marginBottom: 8,
   color: '#333',
-  fontFamily: 'Poppins_400Regular'
+  fontFamily: 'Poppins_400Regular',
+      includeFontPadding: false,
 },
 infoContentDark: {
   fontSize: 14,
   marginBottom: 8,
   color: '#ccc',
-  fontFamily: 'Poppins_400Regular'
+  fontFamily: 'Poppins_400Regular',
+      includeFontPadding: false,
 },
 
 separator: {
@@ -582,7 +634,15 @@ imageGradientDrinkItem: {
     right: 18,
     justifyContent: "center",
     alignItems: "center",
-  }
+  },
+  langRow: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'flex-end', // albo 'space-between' jeśli chcesz odstęp
+},
+separatorLang: {
+  height: 100, 
+}
   
 
   });

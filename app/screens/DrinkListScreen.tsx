@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useCallback, useMemo } from 'react';
 import { FlatList, TextInput, View, Text, Pressable } from 'react-native';
 import DrinkItemSimple from '../DrinkItemSimple';
 import DrinkItem from '../DrinkItem';
@@ -9,8 +9,7 @@ import styles from '../styles';
 import { useTranslation } from 'react-i18next';
 import { FontAwesome } from "@expo/vector-icons";
 import { useFavorites } from "../FavoriteContext";
-import { SafeAreaView } from "react-native-safe-area-context"; // nowa wersja
-
+import { SafeAreaView } from "react-native-safe-area-context";
 
 function DrinkListScreen({ navigation }: { navigation: any }) {
   const { t } = useTranslation();
@@ -33,7 +32,8 @@ function DrinkListScreen({ navigation }: { navigation: any }) {
     })();
   }, [t]);
 
-  const handlePress = async (drink: DrinkSimple) => {
+  // 🔹 Callback z useCallback, stabilna referencja
+  const handlePress = useCallback(async (drink: DrinkSimple) => {
     if (activeDrinkId === drink.id) {
       setActiveDrinkId(null);
       setActiveDrink(null);
@@ -45,13 +45,21 @@ function DrinkListScreen({ navigation }: { navigation: any }) {
         setActiveDrinkId(drink.id);
       }
     }
-  };
+  }, [activeDrinkId, t]);
 
-  // Filtrowanie
-  const filteredDrinks = drinks.filter(d =>
-    (showFavorites ? favoriteIds.includes(d.id) : true) &&
-    d.name.toLowerCase().includes(searchQuery.toLowerCase())
+  // 🔹 Filtrowanie z useMemo
+  const filteredDrinks = useMemo(() => 
+    drinks.filter(d =>
+      (showFavorites ? favoriteIds.includes(d.id) : true) &&
+      d.name.toLowerCase().includes(searchQuery.toLowerCase())
+    ),
+    [drinks, searchQuery, showFavorites, favoriteIds]
   );
+
+  // 🔹 Jeśli elementy mają stałą wysokość np. 100px
+  const getItemLayout = useCallback((data: DrinkSimple[] | null | undefined, index: number) => (
+    { length: 100, offset: 100 * index, index }
+  ), []);
 
   return (
     <SafeAreaView
@@ -77,14 +85,14 @@ function DrinkListScreen({ navigation }: { navigation: any }) {
       {/* ❤️ Przycisk ULUBIONE */}
       <Pressable
         style={{
-  margin: 8,
-  padding: 10,
-  borderRadius: 8,
-  backgroundColor: showFavorites ? "red" : (theme === "dark" ? "#3b3b3bff" : "#ddd"),
-  flexDirection: "row",
-  justifyContent: "center",
-  alignItems: "center",
-}}
+          margin: 8,
+          padding: 10,
+          borderRadius: 8,
+          backgroundColor: showFavorites ? "red" : (theme === "dark" ? "#3b3b3bff" : "#ddd"),
+          flexDirection: "row",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
         onPress={() => setShowFavorites(prev => !prev)}
       >
         <FontAwesome name="heart" size={16} color="white" style={{ marginRight: 6 }} />
@@ -94,6 +102,7 @@ function DrinkListScreen({ navigation }: { navigation: any }) {
       {/* 📋 Lista drinków */}
       <FlatList
         data={filteredDrinks}
+        extraData={activeDrinkId} // 🔹 powoduje rerender przy zmianie activeDrinkId
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) =>
           activeDrinkId === item.id && activeDrink ? (
@@ -102,21 +111,23 @@ function DrinkListScreen({ navigation }: { navigation: any }) {
             <DrinkItemSimple drink={item} onPress={() => handlePress(item)} />
           )
         }
-        contentContainerStyle={{ paddingBottom: 100 }} // żeby lista nie nachodziła na przycisk
+        contentContainerStyle={{ paddingBottom: 100 }}
       />
 
-      {/* 🔙 Przycisk Back – na stałe na dole */}
+      {/* 🔙 Przycisk Back */}
       <View style={{ position: 'absolute', bottom: 20, left: 0, right: 0, alignItems: 'center' }}>
-  <Pressable
-    style={[
-      styles.startButton,
-      theme === "dark" ? styles.buttonDarkMode : styles.buttonWhiteMode
-    ]}
-    onPress={() => navigation.navigate('Main')}
-  >
-    <Text style={[theme === "dark" ? styles.buttonText : styles.buttonTextWhiteMode]}>{t('ButtonTextBack')}</Text>
-  </Pressable>
-</View>
+        <Pressable
+          style={[
+            styles.startButton,
+            theme === "dark" ? styles.buttonDarkMode : styles.buttonWhiteMode
+          ]}
+          onPress={() => navigation.goBack()}
+        >
+          <Text style={[theme === "dark" ? styles.buttonText : styles.buttonTextWhiteMode]}>
+            {t('ButtonTextBack')}
+          </Text>
+        </Pressable>
+      </View>
     </SafeAreaView>
   );
 }

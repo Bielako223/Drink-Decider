@@ -33,7 +33,7 @@ const DrinkItemSimpleComponent: React.FC<Props> = ({ drink, onPress, matchPercen
       <View style={styles.textContainerItemSimple}>
         <Text style={[theme === "dark" ?styles.nameItemSimpleDark:styles.nameItemSimple]}>{drink.name}</Text>
 
-        <Text style={[theme === "dark" ?styles.abvItemSimpleDark:styles.abvItemSimple]}>{drink.range} ABV</Text>
+        <Text style={[theme === "dark" ?styles.abvItemSimpleDark:styles.abvItemSimple]}>{drink.range} {t('ABV')}</Text>
 
         {points !== undefined && maxPoints !== undefined && (
           <Text style={[theme === "dark" ?styles.abvItemSimpleDark:styles.abvItemSimple]}>

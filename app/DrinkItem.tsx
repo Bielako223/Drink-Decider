@@ -43,7 +43,7 @@ const DrinkItemComponent: React.FC<Props> = ({ drink, onPress, matchPercentage, 
           />
           <View style={styles.imageOverlayDrinkItem}>
             <Text style={styles.drinkName}>{drink.name}</Text>
-            <Text style={styles.drinkStrength}>{drink.range}</Text>
+            <Text style={styles.drinkStrength}>{drink.range} {t('ABV')}</Text>
           </View>
         </View>
 
@@ -100,7 +100,7 @@ const DrinkItemComponent: React.FC<Props> = ({ drink, onPress, matchPercentage, 
           <TouchableOpacity style={styles.recipeButton} onPress={() => setPopupVisible(true)}>
            <FontAwesome name="book" size={20} color={theme === "dark" ? "white" : "black"} />
 
-            <Text style={[theme === "dark" ? styles.buttonText : styles.buttonTextWhiteMode]}>{t('Recipe')}</Text>
+            <Text style={[theme === "dark" ? styles.buttonText11 : styles.buttonTextWhiteMode1]}>{t('Recipe')}</Text>
           </TouchableOpacity>
 
           <Popup

@@ -1,6 +1,6 @@
-import React, { useContext } from 'react';
+import React, { useCallback, useContext, useState } from 'react';
 import { Text, View, Image, Pressable } from 'react-native';
-import { useRoute } from "@react-navigation/native";
+import { useFocusEffect, useRoute } from "@react-navigation/native";
 import styles from '../styles';
 import { useTranslation } from 'react-i18next';
 import ChangeLang from '../ChangeLanguage';
@@ -10,6 +10,7 @@ import { SafeAreaView } from "react-native-safe-area-context"; // nowa wersja
 
 
 function MainScreen({ navigation }: { navigation: any }) {
+
   let route = useRoute();
   const { t } = useTranslation();
   const themeContext = useContext(ThemeContext);
@@ -26,17 +27,17 @@ function MainScreen({ navigation }: { navigation: any }) {
     >
       <View style={styles.imgContainer}>
         <View style={styles.changeLanguageContainer}>
-          <Text>
-            <ChangeLang />
-            <Pressable onPress={toggleTheme} style={styles.mt}>
-              {theme === 'dark' ? (
-                <MaterialCommunityIcons name="invert-colors" size={40} color="#FFF" />
-              ) : (
-                <MaterialCommunityIcons name="invert-colors" size={40} color="#000" />
-              )}
-            </Pressable>
-          </Text>
-        </View>
+  <View style={styles.langRow}>
+    <ChangeLang />
+    <Pressable onPress={toggleTheme} style={styles.mt}>
+      {theme === 'dark' ? (
+        <MaterialCommunityIcons name="invert-colors" size={40} color="#FFF" />
+      ) : (
+        <MaterialCommunityIcons name="invert-colors" size={40} color="#000" />
+      )}
+    </Pressable>
+  </View>
+</View>
 
         {theme === 'dark' ? (
           <Image source={require('../assets/barIcon7.png')} style={styles.image} />
@@ -63,7 +64,7 @@ function MainScreen({ navigation }: { navigation: any }) {
           onPress={() => navigation.navigate("RandomDrink")}
           android_ripple={{ color: 'black' }}
         >
-          <Text style={[theme === "dark" ? styles.buttonText : styles.buttonTextWhiteMode]}>{t('MainSecondButton')}</Text>
+          <Text  style={[theme === "dark" ? styles.buttonText : styles.buttonTextWhiteMode]}>{t('MainSecondButton')}</Text>
         </Pressable>
 
         <Pressable

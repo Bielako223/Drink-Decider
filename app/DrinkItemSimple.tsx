@@ -5,7 +5,7 @@ import Images from './DataManagment/Images';
 import { useFavorites } from "./FavoriteContext";
 import { ThemeContext } from "../ThemeContext";
 import { useTranslation } from 'react-i18next';
-import { FontAwesome} from "@expo/vector-icons";
+import { FontAwesome } from "@expo/vector-icons";
 
 
 
@@ -22,35 +22,34 @@ const DrinkItemSimpleComponent: React.FC<Props> = ({ drink, onPress, matchPercen
   const { isFavorite, toggleFavorite } = useFavorites();
   const favorite = isFavorite(drink.id);
   const themeContext = useContext(ThemeContext);
-    if (!themeContext) return null;
-    const { theme } = themeContext;
-    const { t } = useTranslation();
+  if (!themeContext) return null;
+  const { theme } = themeContext;
+  const { t } = useTranslation();
 
   return (
-    <Pressable style={[theme === "dark" ?styles.cardItemSimpleDark:styles.cardItemSimple]} onPress={onPress}>
+    <Pressable style={[theme === "dark" ? styles.cardItemSimpleDark : styles.cardItemSimple]} onPress={onPress}>
       <Image source={Images[imgPath]} style={styles.imageItemSimple} />
 
       <View style={styles.textContainerItemSimple}>
-        <Text style={[theme === "dark" ?styles.nameItemSimpleDark:styles.nameItemSimple]}>{drink.name}</Text>
+        <Text style={[theme === "dark" ? styles.nameItemSimpleDark : styles.nameItemSimple]}>{drink.name}</Text>
 
-        <Text style={[theme === "dark" ?styles.abvItemSimpleDark:styles.abvItemSimple]}>{drink.range} {t('ABV')}</Text>
+        <Text style={[theme === "dark" ? styles.abvItemSimpleDark : styles.abvItemSimple]}>{drink.range} {t('ABV')}</Text>
 
         {points !== undefined && maxPoints !== undefined && (
-          <Text style={[theme === "dark" ?styles.abvItemSimpleDark:styles.abvItemSimple]}>
+          <Text style={[theme === "dark" ? styles.abvItemSimpleDark : styles.abvItemSimple]}>
             {points}/{maxPoints}{" "}
-  {maxPoints === 1
-    ? t('skladnik')       // 1 składnik
-    : maxPoints > 1 && maxPoints < 5
-    ? t('skladniki')      // 2–4 składniki
-    : t('skladnikow')}  
-            </Text>
+            {maxPoints === 1
+              ? t('skladnik')      
+              : maxPoints > 1 && maxPoints < 5
+                ? t('skladniki')     
+                : t('skladnikow')}
+          </Text>
         )}
 
         {matchPercentage !== undefined && points == undefined && maxPoints == undefined && (
-          <Text style={[theme === "dark" ?styles.abvItemSimpleDark:styles.abvItemSimple]}>{t('DrinkMatchingPercentage')} {matchPercentage}%</Text>
+          <Text style={[theme === "dark" ? styles.abvItemSimpleDark : styles.abvItemSimple]}>{t('DrinkMatchingPercentage')} {matchPercentage}%</Text>
         )}
 
-        {/* ❤️ Serce wycentrowane pionowo po prawej */}
         <View style={styles.heartContainerItemSimple}>
           <Pressable onPress={() => toggleFavorite(drink.id)}>
             <FontAwesome
@@ -65,7 +64,6 @@ const DrinkItemSimpleComponent: React.FC<Props> = ({ drink, onPress, matchPercen
   );
 };
 
-// Memo z prostym porównaniem props
 const DrinkItemSimple = memo(
   DrinkItemSimpleComponent,
   (prevProps, nextProps) =>
@@ -96,21 +94,21 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   cardItemSimpleDark: {
-  flexDirection: 'row',
-  alignItems: 'center',
-  marginHorizontal: 12,
-  marginVertical: 6,
-  padding: 12,
-  borderRadius: 12,
-  backgroundColor: '#050712', // ciemne tło
-  borderWidth: 1,
-  borderColor: '#333',       // ciemniejsza ramka
-  shadowColor: '#000',
-  shadowOffset: { width: 0, height: 2 },
-  shadowOpacity: 0.3,        // mocniejszy cień na ciemnym tle
-  shadowRadius: 4,
-  elevation: 3,
-},
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginHorizontal: 12,
+    marginVertical: 6,
+    padding: 12,
+    borderRadius: 12,
+    backgroundColor: '#050712', 
+    borderWidth: 1,
+    borderColor: '#333',       
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,       
+    shadowRadius: 4,
+    elevation: 3,
+  },
   imageItemSimple: {
     width: 100,
     height: 100,

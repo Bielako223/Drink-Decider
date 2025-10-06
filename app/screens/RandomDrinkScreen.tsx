@@ -6,7 +6,7 @@ import { ThemeContext } from "../../ThemeContext";
 import DrinkItem from '../DrinkItem';
 import { GetRandomDrink } from '../DataManagment/DataAccess';
 import { DrinkFull } from '../DataManagment/Classes';
-import { SafeAreaView } from "react-native-safe-area-context"; // nowa wersja
+import { SafeAreaView } from "react-native-safe-area-context";
 
 
 function RandomDrinkScreen({ navigation }: { navigation: any }) {
@@ -18,7 +18,7 @@ function RandomDrinkScreen({ navigation }: { navigation: any }) {
   const [randomDrink, setRandomDrink] = useState<DrinkFull | null>(null);
 
   const loadRandomDrink = async () => {
-    setRandomDrink(null); // efekt ładowania
+    setRandomDrink(null); 
     const drink = await GetRandomDrink(t('Lang') === 'pl' ? 'pl' : 'eng');
     setRandomDrink(drink);
   };

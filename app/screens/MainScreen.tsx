@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import ChangeLang from '../ChangeLanguage';
 import { ThemeContext } from "../../ThemeContext";
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { SafeAreaView } from "react-native-safe-area-context"; // nowa wersja
+import { SafeAreaView } from "react-native-safe-area-context";
 
 
 function MainScreen({ navigation }: { navigation: any }) {
@@ -27,17 +27,17 @@ function MainScreen({ navigation }: { navigation: any }) {
     >
       <View style={styles.imgContainer}>
         <View style={styles.changeLanguageContainer}>
-  <View style={styles.langRow}>
-    <ChangeLang />
-    <Pressable onPress={toggleTheme} style={styles.mt}>
-      {theme === 'dark' ? (
-        <MaterialCommunityIcons name="invert-colors" size={40} color="#FFF" />
-      ) : (
-        <MaterialCommunityIcons name="invert-colors" size={40} color="#000" />
-      )}
-    </Pressable>
-  </View>
-</View>
+          <View style={styles.langRow}>
+            <ChangeLang />
+            <Pressable onPress={toggleTheme} style={styles.mt}>
+              {theme === 'dark' ? (
+                <MaterialCommunityIcons name="invert-colors" size={40} color="#FFF" />
+              ) : (
+                <MaterialCommunityIcons name="invert-colors" size={40} color="#000" />
+              )}
+            </Pressable>
+          </View>
+        </View>
 
         {theme === 'dark' ? (
           <Image source={require('../assets/barIcon7.png')} style={styles.image} />
@@ -64,7 +64,7 @@ function MainScreen({ navigation }: { navigation: any }) {
           onPress={() => navigation.navigate("RandomDrink")}
           android_ripple={{ color: 'black' }}
         >
-          <Text  style={[theme === "dark" ? styles.buttonText : styles.buttonTextWhiteMode]}>{t('MainSecondButton')}</Text>
+          <Text style={[theme === "dark" ? styles.buttonText : styles.buttonTextWhiteMode]}>{t('MainSecondButton')}</Text>
         </Pressable>
 
         <Pressable

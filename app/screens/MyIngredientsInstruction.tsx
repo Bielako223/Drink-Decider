@@ -16,10 +16,8 @@ const WelcomeScreen = ({ navigation }: { navigation: any }) => {
   return (
     <SafeAreaView style={[styles.container, theme === "dark" ? styles.bgColorDarkMode : styles.bgColorWhiteMode]}>
 
-      {/* ScrollView, treść wypełnia ekran */}
       <ScrollView contentContainerStyle={{ flexGrow: 1, padding: 20 }}>
-        
-        {/* Główna treść */}
+
         <View style={{ flex: 1, justifyContent: 'flex-start' }}>
           <Text style={[styles.instructionTextTop, theme === "dark" ? styles.fontColorDarkMode : styles.fontColorWhiteMode]}>
             {t('WelcomeDescription')}
@@ -29,7 +27,6 @@ const WelcomeScreen = ({ navigation }: { navigation: any }) => {
           <Text style={[styles.instructionTextList, theme === "dark" ? styles.fontColorDarkMode : styles.fontColorWhiteMode]}>{t('Step2')}</Text>
           <Text style={[styles.instructionTextList, theme === "dark" ? styles.fontColorDarkMode : styles.fontColorWhiteMode]}>{t('Step3')}</Text>
 
-          {/* Ikony */}
           <View style={styles.iconscontainer}>
             <Text style={[styles.iconstext, theme === "dark" ? styles.fontColorDarkMode : styles.fontColorWhiteMode]}>
               <MaterialCommunityIcons name="liquor" size={50} color={theme === "dark" ? "white" : "black"} />
@@ -43,7 +40,6 @@ const WelcomeScreen = ({ navigation }: { navigation: any }) => {
           </View>
         </View>
 
-        {/* Dolne przyciski */}
         <View style={{ marginTop: 20 }}>
           <Pressable
             style={[styles.button, theme === "dark" ? styles.bottomButtonDarkMode : styles.bottomButtonWhiteMode]}

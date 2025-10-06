@@ -32,7 +32,6 @@ function DrinkListScreen({ navigation }: { navigation: any }) {
     })();
   }, [t]);
 
-  // 🔹 Callback z useCallback, stabilna referencja
   const handlePress = useCallback(async (drink: DrinkSimple) => {
     if (activeDrinkId === drink.id) {
       setActiveDrinkId(null);
@@ -47,8 +46,7 @@ function DrinkListScreen({ navigation }: { navigation: any }) {
     }
   }, [activeDrinkId, t]);
 
-  // 🔹 Filtrowanie z useMemo
-  const filteredDrinks = useMemo(() => 
+  const filteredDrinks = useMemo(() =>
     drinks.filter(d =>
       (showFavorites ? favoriteIds.includes(d.id) : true) &&
       d.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -56,7 +54,6 @@ function DrinkListScreen({ navigation }: { navigation: any }) {
     [drinks, searchQuery, showFavorites, favoriteIds]
   );
 
-  // 🔹 Jeśli elementy mają stałą wysokość np. 100px
   const getItemLayout = useCallback((data: DrinkSimple[] | null | undefined, index: number) => (
     { length: 100, offset: 100 * index, index }
   ), []);
@@ -68,7 +65,6 @@ function DrinkListScreen({ navigation }: { navigation: any }) {
         theme === "dark" ? styles.bgColorDarkMode : styles.bgColorWhiteMode
       ]}
     >
-      {/* 🔍 Pole wyszukiwania */}
       <View style={styles.searchContainer}>
         <TextInput
           style={[
@@ -82,7 +78,6 @@ function DrinkListScreen({ navigation }: { navigation: any }) {
         />
       </View>
 
-      {/* ❤️ Przycisk ULUBIONE */}
       <Pressable
         style={{
           margin: 8,
@@ -99,10 +94,9 @@ function DrinkListScreen({ navigation }: { navigation: any }) {
         <Text style={{ color: "white" }}>{showFavorites ? t('Showall') : t('favorites')}</Text>
       </Pressable>
 
-      {/* 📋 Lista drinków */}
       <FlatList
         data={filteredDrinks}
-        extraData={activeDrinkId} // 🔹 powoduje rerender przy zmianie activeDrinkId
+        extraData={activeDrinkId} 
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) =>
           activeDrinkId === item.id && activeDrink ? (
@@ -114,7 +108,6 @@ function DrinkListScreen({ navigation }: { navigation: any }) {
         contentContainerStyle={{ paddingBottom: 100 }}
       />
 
-      {/* 🔙 Przycisk Back */}
       <View style={{ position: 'absolute', bottom: 20, left: 0, right: 0, alignItems: 'center' }}>
         <Pressable
           style={[

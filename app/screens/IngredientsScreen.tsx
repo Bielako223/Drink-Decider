@@ -6,9 +6,9 @@ import { useTranslation } from 'react-i18next';
 import { BaseItem } from '../DataManagment/Classes';
 import { GetIngredients } from '../DataManagment/DataAccess';
 import { ThemeContext } from "../../ThemeContext";
-import { Ionicons} from "@expo/vector-icons";
-import { SafeAreaView } from "react-native-safe-area-context"; // nowa wersja
-import SimplePopup from '../SimplePopup'; // dostosuj ścieżkę
+import { Ionicons } from "@expo/vector-icons";
+import { SafeAreaView } from "react-native-safe-area-context"; 
+import SimplePopup from '../SimplePopup';
 
 
 
@@ -22,16 +22,16 @@ const IngredientsScreen = ({ navigation }: { navigation: any }) => {
   const [ingredients, setIngredients] = useState<BaseItem[]>([]);
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
   const [popupVisible, setPopupVisible] = useState(false);
-const [popupTitle, setPopupTitle] = useState("");
-const [popupMessage, setPopupMessage] = useState("");
+  const [popupTitle, setPopupTitle] = useState("");
+  const [popupMessage, setPopupMessage] = useState("");
 
-  // Route params
+
   let route: RouteProp<{ params: { taste: number[]; alcohols: number[]; strength: number } }, 'params'> = useRoute();
   const taste = route.params?.taste;
   const alcohols = route.params?.alcohols;
   const strength = route.params?.strength;
 
-  // Pobierz składniki z bazy
+
   useEffect(() => {
     (async () => {
       try {
@@ -54,75 +54,73 @@ const [popupMessage, setPopupMessage] = useState("");
   };
 
   const renderItem = ({ item }: { item: BaseItem }) => {
-  const isSelected = selectedItems.includes(item.id);
+    const isSelected = selectedItems.includes(item.id);
 
-  return (
-    <View
-      style={{
-        flexDirection: "row",
-        marginHorizontal: 16,
-        marginVertical: 8,
-        overflow: "hidden",
-        alignItems: "center",
-      }}
-    >
-      {/* LEWA CZĘŚĆ */}
-      <TouchableOpacity
-        onPress={() => handleSelect(item.id)}
-        style={[
-          styles.item,
-          theme === "dark" ? styles.buttonDarkMode : styles.buttonWhiteMode,
-          isSelected &&
+    return (
+      <View
+        style={{
+          flexDirection: "row",
+          marginHorizontal: 16,
+          marginVertical: 8,
+          overflow: "hidden",
+          alignItems: "center",
+        }}
+      >
+        <TouchableOpacity
+          onPress={() => handleSelect(item.id)}
+          style={[
+            styles.item,
+            theme === "dark" ? styles.buttonDarkMode : styles.buttonWhiteMode,
+            isSelected &&
             (theme === "dark"
               ? styles.bgButtonSelectedColorDarkMode
               : styles.bgbuttonSelectedColorWhiteMode),
-          {
-            flex: 1,
-            borderRadius: 20,
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
-          },
-        ]}
-      >
-        {/* Tekst */}
-        <Text
-          style={[styles.itemText, theme === "dark" ? styles.fontColorDarkMode: styles.fontColorWhiteMode, { flexShrink: 1 }]}
-          numberOfLines={1}
-          ellipsizeMode="tail"
+            {
+              flex: 1,
+              borderRadius: 20,
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center",
+            },
+          ]}
         >
-          {item.name}
-        </Text>
 
-        {/* Ikonka info */}
-        {item.desc && (
-           <Pressable
-  onPress={() => {
-    setPopupTitle(item.name);          // nagłówek = nazwa składnika
-    setPopupMessage(item.desc ?? "");  // treść = opis
-    setPopupVisible(true);
-  }}
-  style={{
-    marginLeft: 8,
-    backgroundColor: theme === "dark" ? "#444" : "#e0e0e0",
-    borderRadius: 50,
-    padding: 7,
-    justifyContent: "center",
-    alignItems: "center",
-  }}
->
-  <Ionicons
-    name="information-circle-outline"
-    size={25}
-    color={theme === "dark" ? "white" : "black"}
-  />
-</Pressable>
+          <Text
+            style={[styles.itemText, theme === "dark" ? styles.fontColorDarkMode : styles.fontColorWhiteMode, { flexShrink: 1 }]}
+            numberOfLines={1}
+            ellipsizeMode="tail"
+          >
+            {item.name}
+          </Text>
 
-        )}
-      </TouchableOpacity>
-    </View>
-  );
-};
+          {item.desc && (
+            <Pressable
+              onPress={() => {
+                setPopupTitle(item.name);       
+                setPopupMessage(item.desc ?? "");  
+                setPopupVisible(true);
+              }}
+              style={{
+                marginLeft: 8,
+                backgroundColor: theme === "dark" ? "#444" : "#e0e0e0",
+                borderRadius: 50,
+                padding: 7,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Ionicons
+                name="information-circle-outline"
+                size={25}
+                color={theme === "dark" ? "white" : "black"}
+              />
+            </Pressable>
+
+          )}
+        </TouchableOpacity>
+      </View>
+    );
+  };
 
   return (
     <SafeAreaView style={[styles.container, theme === "dark" ? styles.bgColorDarkMode : styles.bgColorWhiteMode]}>
@@ -148,18 +146,18 @@ const [popupMessage, setPopupMessage] = useState("");
 
         <Pressable
           style={[styles.button2, theme === "dark" ? styles.bottomButtonDarkMode : styles.bottomButtonWhiteMode]}
-          
+
           onPress={() => navigation.navigate("Drink", { taste, strength, alcohols, ingredients: selectedItems })}
         >
           <Text style={[theme === "dark" ? styles.buttonText : styles.buttonTextWhiteMode]}>{t('ButtonTextNext')}</Text>
         </Pressable>
       </View>
       <SimplePopup
-  isVisible={popupVisible}
-  onClose={() => setPopupVisible(false)}
-  title={popupTitle}
-  message={popupMessage}
-/>
+        isVisible={popupVisible}
+        onClose={() => setPopupVisible(false)}
+        title={popupTitle}
+        message={popupMessage}
+      />
 
     </SafeAreaView>
   );

@@ -1,12 +1,11 @@
 import React, { memo, useContext, useState } from 'react';
-import { View, Text, Image, TouchableOpacity, Pressable, StyleSheet } from 'react-native';
+import { View, Text, Image, TouchableOpacity, Pressable } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useTranslation } from 'react-i18next';
 import { ThemeContext } from "../ThemeContext";
 import Images from './DataManagment/Images';
 import { DrinkFull } from './DataManagment/Classes';
 import { FontAwesome } from "@expo/vector-icons";
-
 import styles from './styles';
 import Popup from './Popup';
 import { useFavorites } from "./FavoriteContext";
@@ -32,9 +31,7 @@ const DrinkItemComponent: React.FC<Props> = ({ drink, onPress, matchPercentage, 
 
   return (
     <TouchableOpacity onPress={onPress} activeOpacity={0.9}>
-      <View style={[theme === "dark" ? styles.drinkCardDark: styles.drinkCard]}>
-        
-        {/* --- Obrazek --- */}
+      <View style={[theme === "dark" ? styles.drinkCardDark : styles.drinkCard]}>
         <View style={styles.imageContainer}>
           <Image source={Images[ImgPath]} style={styles.drinkImage} />
           <LinearGradient
@@ -47,48 +44,44 @@ const DrinkItemComponent: React.FC<Props> = ({ drink, onPress, matchPercentage, 
           </View>
         </View>
 
-        {/* --- Szczegóły --- */}
         <View style={styles.infoContainer}>
-          {/* procent dopasowania */}
-          {matchPercentage !== undefined && points == undefined && maxPoints == undefined &&  (
+          {matchPercentage !== undefined && points == undefined && maxPoints == undefined && (
             <View style={styles.matchBadgeDrinkItem}>
               <Text style={styles.matchBadgeTextDrinkItem}>
                 {t('DrinkMatchingPercentage')} {matchPercentage}%
               </Text>
             </View>
           )}
-
-          {/* punkty */}
           {points !== undefined && maxPoints !== undefined && (
             <View style={styles.matchBadgeDrinkItem}>
               <Text style={styles.matchBadgeTextDrinkItem}>
-  {points}/{maxPoints}{" "}
-  {maxPoints === 1
-    ? t('skladnik')       // 1 składnik
-    : maxPoints > 1 && maxPoints < 5
-    ? t('skladniki')      // 2–4 składniki
-    : t('skladnikow')}    
-</Text>
+                {points}/{maxPoints}{" "}
+                {maxPoints === 1
+                  ? t('skladnik')      
+                  : maxPoints > 1 && maxPoints < 5
+                    ? t('skladniki')     
+                    : t('skladnikow')}
+              </Text>
             </View>
           )}
 
-          <Text style={[theme === "dark" ?styles.infoHeaderDark:styles.infoHeader]}>{t('Description')}</Text>
-          <Text style={[theme === "dark" ?styles.infoContentDark:styles.infoContent]}>{drink.description ?? ''}</Text>
+          <Text style={[theme === "dark" ? styles.infoHeaderDark : styles.infoHeader]}>{t('Description')}</Text>
+          <Text style={[theme === "dark" ? styles.infoContentDark : styles.infoContent]}>{drink.description ?? ''}</Text>
           <View style={styles.separator} />
 
-          <Text style={[theme === "dark" ?styles.infoHeaderDark:styles.infoHeader]}>{t('DrinkTaste')}</Text>
-          <Text style={[theme === "dark" ?styles.infoContentDark:styles.infoContent]}>
+          <Text style={[theme === "dark" ? styles.infoHeaderDark : styles.infoHeader]}>{t('DrinkTaste')}</Text>
+          <Text style={[theme === "dark" ? styles.infoContentDark : styles.infoContent]}>
             {drink.tastes.map((v, i, arr) => i === arr.length - 1 ? v.name + '.' : v.name + ', ')}
           </Text>
           <View style={styles.separator} />
 
-          <Text style={[theme === "dark" ?styles.infoHeaderDark:styles.infoHeader]}>{t('DrinkIngredients')}</Text>
-          <Text style={[theme === "dark" ?styles.infoContentDark:styles.infoContent]}>
+          <Text style={[theme === "dark" ? styles.infoHeaderDark : styles.infoHeader]}>{t('DrinkIngredients')}</Text>
+          <Text style={[theme === "dark" ? styles.infoContentDark : styles.infoContent]}>
             {drink.ingredients.map((v, i, arr) => i === arr.length - 1 ? v.name + '.' : v.name + ', ')}
           </Text>
           <View style={styles.separator} />
 
-          <Text style={[theme === "dark" ?styles.infoHeaderDark:styles.infoHeader]}>{t('DrinkAlcohols')}</Text>
+          <Text style={[theme === "dark" ? styles.infoHeaderDark : styles.infoHeader]}>{t('DrinkAlcohols')}</Text>
           <View style={styles.alcoholsContainerDrinkItem}>
             {drink.alcohols.map((v, i) => (
               <View key={i} style={styles.alcoholBadgeDrinkItem}>
@@ -98,7 +91,7 @@ const DrinkItemComponent: React.FC<Props> = ({ drink, onPress, matchPercentage, 
           </View>
 
           <TouchableOpacity style={styles.recipeButton} onPress={() => setPopupVisible(true)}>
-           <FontAwesome name="book" size={20} color={theme === "dark" ? "white" : "black"} />
+            <FontAwesome name="book" size={20} color={theme === "dark" ? "white" : "black"} />
 
             <Text style={[theme === "dark" ? styles.buttonText11 : styles.buttonTextWhiteMode1]}>{t('Recipe')}</Text>
           </TouchableOpacity>
@@ -111,7 +104,6 @@ const DrinkItemComponent: React.FC<Props> = ({ drink, onPress, matchPercentage, 
           />
         </View>
 
-        {/* --- Ikona serduszka --- */}
         <Pressable
           onPress={() => toggleFavorite(drink.id)}
           style={styles.heartContainerDrinkItem}

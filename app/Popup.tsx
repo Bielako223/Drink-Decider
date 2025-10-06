@@ -4,7 +4,7 @@ import styles from './styles';
 import { useTranslation } from 'react-i18next';
 import { ThemeContext } from "../ThemeContext";
 import { GetDrinkDetails } from "./DataManagment/DataAccess";
-import { Instruction, PrepIngredient,DrinkDetails } from "./DataManagment/Classes";
+import { Instruction, PrepIngredient, DrinkDetails } from "./DataManagment/Classes";
 
 interface PopupProps {
   isVisible: boolean;
@@ -26,8 +26,8 @@ const Popup: React.FC<PopupProps> = ({ isVisible, onClose, drinkId, lang }) => {
     if (isVisible && drinkId !== null) {
       (async () => {
         const details: DrinkDetails | null = await GetDrinkDetails(drinkId, lang);
-setIngredients(details?.prepIngredients ?? []);
-setInstructions(details?.instructions ?? []);
+        setIngredients(details?.prepIngredients ?? []);
+        setInstructions(details?.instructions ?? []);
       })();
     } else {
       setIngredients([]);

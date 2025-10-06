@@ -8,7 +8,7 @@ import { MyIngredientsGetDrinks } from "../DataManagment/DataAccess";
 import { ThemeContext } from "../../ThemeContext";
 import DrinkItem from "../DrinkItem";
 import DrinkItemSimple from "../DrinkItemSimple";
-import { SafeAreaView } from "react-native-safe-area-context"; // nowa wersja
+import { SafeAreaView } from "react-native-safe-area-context";
 
 
 function MyIngredientsResutScreen({ navigation }: { navigation: any }) {
@@ -19,7 +19,6 @@ function MyIngredientsResutScreen({ navigation }: { navigation: any }) {
 
   let route: RouteProp<{ params: { alcohols: string[]; ingredients: string[] } }, "params"> = useRoute();
 
-  // Zamiana stringów na number raz przy inicjalizacji
   const alcohols = React.useMemo(() => (route.params?.alcohols ?? []).map(id => Number(id)), [route.params?.alcohols]);
   const ingredients = React.useMemo(() => (route.params?.ingredients ?? []).map(id => Number(id)), [route.params?.ingredients]);
 
@@ -28,7 +27,7 @@ function MyIngredientsResutScreen({ navigation }: { navigation: any }) {
   const [activeIndex, setActiveIndex] = useState<number>(0);
 
   useEffect(() => {
-    let isMounted = true; // zabezpieczenie przed odmontowaniem komponentu
+    let isMounted = true; 
 
     const loadDrinks = async () => {
       setLoading(true);

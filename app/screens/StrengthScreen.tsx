@@ -1,17 +1,11 @@
 import React, { useState, useContext, useEffect } from "react";
-import {
-  FlatList,
-  Text,
-  TouchableOpacity,
-  Pressable,
-  View,
-} from "react-native";
+import { FlatList, Text, TouchableOpacity, Pressable, View } from "react-native";
 import { useRoute, RouteProp } from "@react-navigation/native";
 import styles from "../styles";
 import { useTranslation } from "react-i18next";
 import { BaseItem } from "../DataManagment/Classes";
 import { GetStrength } from "../DataManagment/DataAccess";
-import { SafeAreaView } from "react-native-safe-area-context"; // nowa wersja
+import { SafeAreaView } from "react-native-safe-area-context";
 
 import { ThemeContext } from "../../ThemeContext";
 
@@ -53,12 +47,12 @@ const StrengthScreen = ({ navigation }: { navigation: any }) => {
             styles.item,
             theme === "dark" ? styles.buttonDarkMode : styles.buttonWhiteMode,
             isSelected &&
-              (theme === "dark"
-                ? styles.bgButtonSelectedColorDarkMode
-                : styles.bgbuttonSelectedColorWhiteMode),
+            (theme === "dark"
+              ? styles.bgButtonSelectedColorDarkMode
+              : styles.bgbuttonSelectedColorWhiteMode),
           ]}
         >
-          <Text style={[styles.itemText, theme === "dark" ? styles.fontColorDarkMode: styles.fontColorWhiteMode]}>{item.name}</Text>
+          <Text style={[styles.itemText, theme === "dark" ? styles.fontColorDarkMode : styles.fontColorWhiteMode]}>{item.name}</Text>
         </TouchableOpacity>
       </View>
     );
@@ -108,7 +102,7 @@ const StrengthScreen = ({ navigation }: { navigation: any }) => {
           onPress={() =>
             navigation.navigate("Alcohol", {
               taste: taste,
-              strength: selectedItem, // teraz number | null
+              strength: selectedItem, 
             })
           }
         >

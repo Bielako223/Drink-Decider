@@ -14,7 +14,6 @@ const FavoriteContext = createContext<FavoriteContextType | undefined>(undefined
 export const FavoriteProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [favoriteIds, setFavoriteIds] = useState<number[]>([]);
 
-  // Ładowanie ulubionych z pamięci
   useEffect(() => {
     (async () => {
       try {
@@ -26,7 +25,6 @@ export const FavoriteProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     })();
   }, []);
 
-  // Zapis do pamięci gdy się zmienia
   useEffect(() => {
     AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(favoriteIds));
   }, [favoriteIds]);

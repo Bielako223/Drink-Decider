@@ -8,7 +8,7 @@ import { DrinkFull } from "../DataManagment/Classes";
 import DrinkItem from "../DrinkItem";
 import DrinkItemSimple from "../DrinkItemSimple";
 import { GetTopDrinks } from "../DataManagment/DataAccess";
-import { SafeAreaView } from "react-native-safe-area-context"; // nowa wersja
+import { SafeAreaView } from "react-native-safe-area-context"; 
 
 
 function DrinkScreen({ navigation }: { navigation: any }) {
@@ -29,7 +29,7 @@ function DrinkScreen({ navigation }: { navigation: any }) {
 
   const [drinks, setDrinks] = useState<DrinkFull[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeIndex, setActiveIndex] = useState<number>(0); // pierwszy drink na start jest DrinkItem
+  const [activeIndex, setActiveIndex] = useState<number>(0); 
 
   useEffect(() => {
     (async () => {
@@ -48,7 +48,6 @@ function DrinkScreen({ navigation }: { navigation: any }) {
 
   const handlePress = (index: number) => {
     if (activeIndex === index) {
-      // kliknięcie na aktywny DrinkItem → zamień go na DrinkItemSimple
       setActiveIndex(-1);
     } else {
       setActiveIndex(index);
@@ -74,34 +73,34 @@ function DrinkScreen({ navigation }: { navigation: any }) {
             </Text>
 
             {drinks.map((drink, index) => (
-  <React.Fragment key={drink.id}>
-    {index === 1 && (
-      <Text
-        style={[
-          styles.topText,
-          theme === "dark" ? styles.fontColorDarkMode : styles.fontColorWhiteMode,
-          { marginTop: 16, marginBottom: 8 }
-        ]}
-      >
-        {t("DrinkYouCanLike")} {/* w pliku tłumaczeń dodaj: "DrinkMayLike": "Mogą ci się spodobać:" */}
-      </Text>
-    )}
+              <React.Fragment key={drink.id}>
+                {index === 1 && (
+                  <Text
+                    style={[
+                      styles.topText,
+                      theme === "dark" ? styles.fontColorDarkMode : styles.fontColorWhiteMode,
+                      { marginTop: 16, marginBottom: 8 }
+                    ]}
+                  >
+                    {t("DrinkYouCanLike")} 
+                  </Text>
+                )}
 
-    {activeIndex === index ? (
-      <DrinkItem
-        drink={drink}
-        matchPercentage={drink.percentage}
-        onPress={() => handlePress(index)}
-      />
-    ) : (
-      <DrinkItemSimple
-        drink={drink}
-        matchPercentage={drink.percentage}
-        onPress={() => handlePress(index)}
-      />
-    )}
-  </React.Fragment>
-))}
+                {activeIndex === index ? (
+                  <DrinkItem
+                    drink={drink}
+                    matchPercentage={drink.percentage}
+                    onPress={() => handlePress(index)}
+                  />
+                ) : (
+                  <DrinkItemSimple
+                    drink={drink}
+                    matchPercentage={drink.percentage}
+                    onPress={() => handlePress(index)}
+                  />
+                )}
+              </React.Fragment>
+            ))}
           </View>
         )}
 

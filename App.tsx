@@ -16,7 +16,7 @@ import WelcomeScreen from './app/screens/MyIngredientsInstruction';
 import { I18nextProvider } from 'react-i18next';
 import i18next from './services/i18next';
 import { ThemeProvider, ThemeContext } from "./ThemeContext";
-import React, { useContext, useEffect } from 'react';
+import React, { useContext } from 'react';
 import { useFonts, Poppins_400Regular, Poppins_700Bold, Poppins_500Medium } from '@expo-google-fonts/poppins';
 import { FavoriteProvider } from './app/FavoriteContext';
 
@@ -33,23 +33,23 @@ function AppContent() {
     <>
       <StatusBar barStyle={theme === "dark" ? "light-content" : "dark-content"} backgroundColor={theme === "dark" ? "#050712" : "white"} />
       <FavoriteProvider>
-      <NavigationContainer>
-        <Stack.Navigator initialRouteName='Main'>
-          <Stack.Screen name="Main" component={MainScreen} options={{ headerShown: false }} />
-          <Stack.Screen name="Taste" component={TasteScreen} options={{ headerShown: false }} />
-          <Stack.Screen name="Alcohol" component={AlcoholScreen} options={{ headerShown: false }} />
-          <Stack.Screen name="Strength" component={StrengthScreen} options={{ headerShown: false }} />
-          <Stack.Screen name="Ingredients" component={IngredientsScreen} options={{ headerShown: false }} />
-          <Stack.Screen name="Drink" component={DrinkScreen} options={{ headerShown: false }} />
-          <Stack.Screen name="RandomDrink" component={RandomDrinkScreen} options={{ headerShown: false }} />
-          <Stack.Screen name="DrinkList" component={DrinkListScreen} options={{ headerShown: false }} />
-          <Stack.Screen name="MyIngredientsAlcohol" component={MyIngredientsAlcoholScreen} options={{ headerShown: false }} />
-          <Stack.Screen name="MyIngredientsIngredients" component={MyIngredientsIngredientsScreen} options={{ headerShown: false }} />
-          <Stack.Screen name="MyIngredientsResut" component={MyIngredientsResutScreen} options={{ headerShown: false }} />
-          <Stack.Screen name="WelcomeScreen" component={WelcomeScreen} options={{ headerShown: false }} />
+        <NavigationContainer>
+          <Stack.Navigator initialRouteName='Main'>
+            <Stack.Screen name="Main" component={MainScreen} options={{ headerShown: false }} />
+            <Stack.Screen name="Taste" component={TasteScreen} options={{ headerShown: false }} />
+            <Stack.Screen name="Alcohol" component={AlcoholScreen} options={{ headerShown: false }} />
+            <Stack.Screen name="Strength" component={StrengthScreen} options={{ headerShown: false }} />
+            <Stack.Screen name="Ingredients" component={IngredientsScreen} options={{ headerShown: false }} />
+            <Stack.Screen name="Drink" component={DrinkScreen} options={{ headerShown: false }} />
+            <Stack.Screen name="RandomDrink" component={RandomDrinkScreen} options={{ headerShown: false }} />
+            <Stack.Screen name="DrinkList" component={DrinkListScreen} options={{ headerShown: false }} />
+            <Stack.Screen name="MyIngredientsAlcohol" component={MyIngredientsAlcoholScreen} options={{ headerShown: false }} />
+            <Stack.Screen name="MyIngredientsIngredients" component={MyIngredientsIngredientsScreen} options={{ headerShown: false }} />
+            <Stack.Screen name="MyIngredientsResut" component={MyIngredientsResutScreen} options={{ headerShown: false }} />
+            <Stack.Screen name="WelcomeScreen" component={WelcomeScreen} options={{ headerShown: false }} />
 
-        </Stack.Navigator>
-      </NavigationContainer>
+          </Stack.Navigator>
+        </NavigationContainer>
       </FavoriteProvider>
     </>
   );

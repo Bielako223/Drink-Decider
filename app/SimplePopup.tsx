@@ -13,8 +13,8 @@ interface SimplePopupProps {
 }
 
 const SimplePopup: React.FC<SimplePopupProps> = ({ isVisible, onClose, title, message }) => {
-    const { t } = useTranslation();
-  
+  const { t } = useTranslation();
+
   const themeContext = useContext(ThemeContext);
   if (!themeContext) return null;
   const { theme } = themeContext;
@@ -23,13 +23,9 @@ const SimplePopup: React.FC<SimplePopupProps> = ({ isVisible, onClose, title, me
     <Modal transparent={true} visible={isVisible} onRequestClose={onClose} animationType="fade">
       <View style={styles.modalOverlay}>
         <View style={styles.modalContent}>
-          {/* Nagłówek */}
           <Text style={styles.drinkTextBold}>{title}</Text>
-
-          {/* Treść */}
           <Text style={[styles.popupListText, { marginVertical: 10 }]}>{message}</Text>
 
-          {/* Przycisk zamknięcia */}
           <TouchableOpacity
             onPress={onClose}
             style={[
@@ -37,7 +33,7 @@ const SimplePopup: React.FC<SimplePopupProps> = ({ isVisible, onClose, title, me
               theme === "dark" ? styles.buttonDarkMode : styles.buttonWhiteMode
             ]}
           >
-                        <Text style={[theme === "dark" ? styles.buttonText : styles.buttonTextWhiteMode]}>{t('Close')}</Text>
+            <Text style={[theme === "dark" ? styles.buttonText : styles.buttonTextWhiteMode]}>{t('Close')}</Text>
 
           </TouchableOpacity>
         </View>

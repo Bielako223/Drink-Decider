@@ -1,7 +1,6 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { FlatList, Text, TouchableOpacity, View, Pressable,Alert } from 'react-native';
-import { SafeAreaView } from "react-native-safe-area-context"; // nowa wersja
-
+import { FlatList, Text, TouchableOpacity, View, Pressable } from 'react-native';
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useRoute, RouteProp } from "@react-navigation/native";
 import styles from '../styles';
 import { useTranslation } from 'react-i18next';
@@ -19,25 +18,24 @@ const AlcoholScreen = ({ navigation }: { navigation: any }) => {
   if (!themeContext) return null;
   const { theme } = themeContext;
 
-  // Route params
+
   let route: RouteProp<{ params: { taste: number[]; strength: number } }, 'params'> = useRoute();
   const taste = route.params?.taste;
   const strength = route.params?.strength;
 
-  // State
+  
   const [alcohol, setAlcohol] = useState<BaseItem[]>([]);
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
   const [popupVisible, setPopupVisible] = useState(false);
-const [popupTitle, setPopupTitle] = useState("");
-const [popupMessage, setPopupMessage] = useState("");
+  const [popupTitle, setPopupTitle] = useState("");
+  const [popupMessage, setPopupMessage] = useState("");
 
-  // Load alcohol list
+ 
   useEffect(() => {
     (async () => {
       try {
         const lang = t('Lang') === 'pl' ? 'pl' : 'eng';
         const data = await GetAlcohol(lang);
-        // sortowanie po name
         data.sort((a, b) => a.name.localeCompare(b.name));
         setAlcohol(data);
       } catch (err) {
@@ -55,77 +53,74 @@ const [popupMessage, setPopupMessage] = useState("");
   };
 
   const renderItem = ({ item }: { item: BaseItem }) => {
-  const isSelected = selectedItems.includes(item.id);
-  const hasDesc = item.desc && item.desc !== "";
-  return (
-    <View
-      style={{
-        flexDirection: 'row',
-        marginHorizontal: 16,
-        marginVertical: 8,
-        overflow: 'hidden',
-        alignItems: 'center',
-      }}
-    >
-      {/* LEWA CZĘŚĆ */}
-      <TouchableOpacity
-        onPress={() => handleSelect(item.id)}
-        style={[
-          styles.item,
-          theme === "dark" ? styles.buttonDarkMode : styles.buttonWhiteMode,
-          isSelected &&
+    const isSelected = selectedItems.includes(item.id);
+    const hasDesc = item.desc && item.desc !== "";
+    return (
+      <View
+        style={{
+          flexDirection: 'row',
+          marginHorizontal: 16,
+          marginVertical: 8,
+          overflow: 'hidden',
+          alignItems: 'center',
+        }}
+      >
+        <TouchableOpacity
+          onPress={() => handleSelect(item.id)}
+          style={[
+            styles.item,
+            theme === "dark" ? styles.buttonDarkMode : styles.buttonWhiteMode,
+            isSelected &&
             (theme === "dark"
               ? styles.bgButtonSelectedColorDarkMode
               : styles.bgbuttonSelectedColorWhiteMode),
-          {
-            flex: 1,
-            borderRadius: 20,
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
-          },
-        ]}
-      >
-        {/* Tekst */}
-        <Text
-          style={[styles.itemText, theme === "dark" ? styles.fontColorDarkMode: styles.fontColorWhiteMode, { flexShrink: 1 }]}
-          numberOfLines={1}
-          ellipsizeMode="tail"
+            {
+              flex: 1,
+              borderRadius: 20,
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center",
+            },
+          ]}
         >
-          {item.name}
-        </Text>
+          <Text
+            style={[styles.itemText, theme === "dark" ? styles.fontColorDarkMode : styles.fontColorWhiteMode, { flexShrink: 1 }]}
+            numberOfLines={1}
+            ellipsizeMode="tail"
+          >
+            {item.name}
+          </Text>
 
-        {/* Ikonka info */}
-        {hasDesc && (
-  <Pressable
-  onPress={() => {
-    setPopupTitle(item.name);          // np. nagłówek popupu = nazwa alkoholu
-    setPopupMessage(item.desc ?? "");  // treść popupu = opis
-    setPopupVisible(true);
-  }}
-  style={{
-    marginLeft: 8,
-    backgroundColor: theme === "dark" ? "#444" : "#e0e0e0",
-    borderRadius: 50,
-    padding: 7,
-    justifyContent: "center",
-    alignItems: "center",
-  }}
->
-  <Ionicons
-    name="information-circle-outline"
-    size={25}
-    color={theme === "dark" ? "white" : "black"}
-  />
-</Pressable>
-)}
+          {hasDesc && (
+            <Pressable
+              onPress={() => {
+                setPopupTitle(item.name);        
+                setPopupMessage(item.desc ?? ""); 
+                setPopupVisible(true);
+              }}
+              style={{
+                marginLeft: 8,
+                backgroundColor: theme === "dark" ? "#444" : "#e0e0e0",
+                borderRadius: 50,
+                padding: 7,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Ionicons
+                name="information-circle-outline"
+                size={25}
+                color={theme === "dark" ? "white" : "black"}
+              />
+            </Pressable>
+          )}
 
 
 
-      </TouchableOpacity>
-    </View>
-  );
-};
+        </TouchableOpacity>
+      </View>
+    );
+  };
 
 
   return (
@@ -180,11 +175,11 @@ const [popupMessage, setPopupMessage] = useState("");
         </Pressable>
       </View>
       <SimplePopup
-  isVisible={popupVisible}
-  onClose={() => setPopupVisible(false)}
-  title={popupTitle}
-  message={popupMessage}
-/>
+        isVisible={popupVisible}
+        onClose={() => setPopupVisible(false)}
+        title={popupTitle}
+        message={popupMessage}
+      />
     </SafeAreaView>
   );
 };

@@ -1,9 +1,9 @@
 import React, { useState, useContext, useEffect } from "react";
 import { FlatList, Text, TouchableOpacity, View, Pressable } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context"; // nowa wersja
+import { SafeAreaView } from "react-native-safe-area-context";
 import styles from "../styles";
 import { useTranslation } from "react-i18next";
-import { BaseItem } from "../DataManagment/Classes"; 
+import { BaseItem } from "../DataManagment/Classes";
 import { GetTaste } from "../DataManagment/DataAccess";
 import { ThemeContext } from "../../ThemeContext";
 import SimplePopup from "../SimplePopup";
@@ -17,8 +17,8 @@ const TasteScreen = ({ navigation }: { navigation: any }) => {
   const [taste, setTaste] = useState<BaseItem[]>([]);
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
   const [popupVisible, setPopupVisible] = useState(false);
-const [popupTitle, setPopupTitle] = useState(t('Warning'));
-const [popupMessage, setPopupMessage] = useState("");
+  const [popupTitle, setPopupTitle] = useState(t('Warning'));
+  const [popupMessage, setPopupMessage] = useState("");
 
   useEffect(() => {
     (async () => {
@@ -38,10 +38,10 @@ const [popupMessage, setPopupMessage] = useState("");
     } else if (selectedItems.length < 2) {
       setSelectedItems([...selectedItems, id]);
     } else {
-  setPopupTitle(t("Warning")); // nagłówek popupu
-  setPopupMessage(t("SelectTasteAlert")); // treść popupu
-  setPopupVisible(true);
-}
+      setPopupTitle(t("Warning")); 
+      setPopupMessage(t("SelectTasteAlert")); 
+      setPopupVisible(true);
+    }
   };
 
   const renderItem = ({ item }: { item: BaseItem }) => {
@@ -99,11 +99,11 @@ const [popupMessage, setPopupMessage] = useState("");
         </Pressable>
       </View>
       <SimplePopup
-  isVisible={popupVisible}
-  onClose={() => setPopupVisible(false)}
-  title={popupTitle}
-  message={popupMessage}
-/>
+        isVisible={popupVisible}
+        onClose={() => setPopupVisible(false)}
+        title={popupTitle}
+        message={popupMessage}
+      />
     </SafeAreaView>
   );
 };

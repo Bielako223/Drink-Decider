@@ -215,7 +215,6 @@ export async function GetTopDrinks(
     const rows: {
       drink_id: number;
       strength_id: number | null;
-      points_max: number; 
       alcohol_id: number | null;
       ingredient_id: number | null;
       taste_id: number | null;
@@ -224,7 +223,6 @@ export async function GetTopDrinks(
       SELECT 
         d.id as drink_id,
         d.strength_id,
-        d.points_max,
         da.alcohol_id,
         di.ingredient_id,
         dt.taste_id
@@ -257,11 +255,9 @@ export async function GetTopDrinks(
       }
     }
 
-    const maxPossiblePoints = 4 + (taste.length * 6) + (alcohols.length * 5);
-
     const scored = Object.entries(grouped)
       .map(([id, drink]) => {
-   
+        // Logika wykluczania składników
         const hasExcludedIngredient = drink.ingredients.some(i => ingredients.includes(i));
         if (hasExcludedIngredient) {
           return null;
@@ -269,21 +265,30 @@ export async function GetTopDrinks(
 
         let points = 0;
 
+        // 1. Punkty za moc (Maksymalnie 5 pkt)
         if (strength === 5 || drink.strength_id === strength) {
-          points += 4;
+          points += 5;
         }
 
+        // 2. Punkty za smaki (6 pkt za każdy pasujący smak)
         for (const t of drink.tastes) {
           if (taste.includes(t)) points += 6;
         }
 
+        // 3. Punkty za alkohole (bonusowe, nie wliczane do maxPoints według Twojego wzoru)
         for (const a of drink.alcohols) {
-          if (alcohols.includes(a)) points += 5;
+          if (alcohols.includes(a)) points += 4;
         }
 
-        let percentage = Math.round((100 * points) / (maxPossiblePoints || 1));
+        // DYNAMICZNE MAX POINTS dla konkretnego drinka
+        // Wzór: 5 (za moc) + 6 * ilość smaków, które ten drink posiada
+        const drinkMaxPoints = 5 + (drink.tastes.length * 6);
+
+        // Obliczanie procentowe
+        let percentage = Math.round((100 * points) / (drinkMaxPoints || 1));
         
-        percentage = Math.min(percentage, 100);
+        // Zabezpieczenie przed przekroczeniem 100% (np. przez punkty z alkoholi)
+        //percentage = Math.min(percentage, 100);
 
         return { drink_id: Number(id), points, percentage };
       })
@@ -294,9 +299,7 @@ export async function GetTopDrinks(
     const sortedScored = scored.sort((a, b) => b.percentage - a.percentage || b.points - a.points);
 
     const countOver70 = sortedScored.filter(d => d.percentage > 70).length;
-
     const limit = Math.max(5, countOver70);
-
     const top = sortedScored.slice(0, limit);
 
     const results: DrinkFull[] = [];

@@ -40,9 +40,9 @@ function MainScreen({ navigation }: { navigation: any }) {
         </View>
 
         {theme === 'dark' ? (
-          <Image source={require('../assets/barIcon7.png')} style={styles.image} />
+          <Image source={require('../assets/barIcon7.webp')} style={styles.image} />
         ) : (
-          <Image source={require('../assets/barIcon6.png')} style={styles.image} />
+          <Image source={require('../assets/barIcon6.webp')} style={styles.image} />
         )}
 
         <Pressable

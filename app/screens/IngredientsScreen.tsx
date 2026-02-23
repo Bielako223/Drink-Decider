@@ -1,5 +1,5 @@
-import React, { useState, useContext, useEffect } from 'react';
-import { FlatList, Text, TouchableOpacity, View, Pressable } from 'react-native';
+import React, { useState, useContext, useEffect, useMemo } from 'react';
+import { FlatList, Text, TouchableOpacity, View, Pressable, TextInput } from 'react-native';
 import { useRoute, RouteProp } from "@react-navigation/native";
 import styles from '../styles';
 import { useTranslation } from 'react-i18next';
@@ -9,9 +9,6 @@ import { ThemeContext } from "../../ThemeContext";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context"; 
 import SimplePopup from '../SimplePopup';
-
-
-
 
 const IngredientsScreen = ({ navigation }: { navigation: any }) => {
   const { t } = useTranslation();
@@ -25,12 +22,13 @@ const IngredientsScreen = ({ navigation }: { navigation: any }) => {
   const [popupTitle, setPopupTitle] = useState("");
   const [popupMessage, setPopupMessage] = useState("");
 
+  // DODANE: Stan wyszukiwarki
+  const [searchQuery, setSearchQuery] = useState('');
 
   let route: RouteProp<{ params: { taste: number[]; alcohols: number[]; strength: number } }, 'params'> = useRoute();
   const taste = route.params?.taste;
   const alcohols = route.params?.alcohols;
   const strength = route.params?.strength;
-
 
   useEffect(() => {
     (async () => {
@@ -52,6 +50,14 @@ const IngredientsScreen = ({ navigation }: { navigation: any }) => {
       setSelectedItems([...selectedItems, id]);
     }
   };
+
+  // DODANE: Filtrowanie składników na podstawie wyszukiwania
+  const filteredIngredients = useMemo(() => {
+    if (!searchQuery) return ingredients;
+    return ingredients.filter(i => 
+      i.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [ingredients, searchQuery]);
 
   const renderItem = ({ item }: { item: BaseItem }) => {
     const isSelected = selectedItems.includes(item.id);
@@ -128,9 +134,23 @@ const IngredientsScreen = ({ navigation }: { navigation: any }) => {
         {t('IngredientsText1')}{"\n"}<Text style={styles.boldText1}>{t('IngredientsText2')}</Text>{t('IngredientsText3')}
       </Text>
 
+      {/* DODANE: Wyszukiwarka */}
+      <View style={styles.searchContainer}>
+        <TextInput
+          style={[
+            styles.searchInput,
+            theme === "dark" ? styles.fontColorDarkMode : styles.fontColorWhiteMode
+          ]}
+          placeholder={t('SearchPlaceholder')}
+          placeholderTextColor={theme === "dark" ? 'white' : 'black'}
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+        />
+      </View>
+
       <FlatList
         style={styles.bottomSpace}
-        data={ingredients}
+        data={filteredIngredients} // ZMIENIONE: korzysta z przefiltrowanej listy
         renderItem={renderItem}
         keyExtractor={item => item.id.toString()}
         extraData={selectedItems}
@@ -146,7 +166,6 @@ const IngredientsScreen = ({ navigation }: { navigation: any }) => {
 
         <Pressable
           style={[styles.button2, theme === "dark" ? styles.bottomButtonDarkMode : styles.bottomButtonWhiteMode]}
-
           onPress={() => navigation.navigate("Drink", { taste, strength, alcohols, ingredients: selectedItems })}
         >
           <Text style={[theme === "dark" ? styles.buttonText : styles.buttonTextWhiteMode]}>{t('ButtonTextNext')}</Text>

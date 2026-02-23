@@ -1,5 +1,5 @@
-import React, { useState, useContext, useEffect } from "react";
-import {FlatList,Text,TouchableOpacity,View, Pressable} from "react-native";
+import React, { useState, useContext, useEffect, useMemo } from "react";
+import {FlatList,Text,TouchableOpacity,View, Pressable, TextInput} from "react-native";
 import { useTranslation } from "react-i18next";
 import styles from "../styles";
 import { BaseItem } from "../DataManagment/Classes";
@@ -8,10 +8,6 @@ import { ThemeContext } from "../../ThemeContext";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import SimplePopup from '../SimplePopup'; 
-
-
-
-
 
 const MyIngredientsAlcoholScreen = ({ navigation }: { navigation: any }) => {
   const { t } = useTranslation();
@@ -25,8 +21,9 @@ const MyIngredientsAlcoholScreen = ({ navigation }: { navigation: any }) => {
   const [popupTitle, setPopupTitle] = useState("");
   const [popupMessage, setPopupMessage] = useState("");
 
+  // DODANE: Stan wyszukiwarki
+  const [searchQuery, setSearchQuery] = useState("");
 
- 
   useEffect(() => {
     (async () => {
       try {
@@ -47,6 +44,14 @@ const MyIngredientsAlcoholScreen = ({ navigation }: { navigation: any }) => {
       setSelectedItems([...selectedItems, id]);
     }
   };
+
+  // DODANE: Filtrowanie alkoholi na podstawie wyszukiwania
+  const filteredAlcohol = useMemo(() => {
+    if (!searchQuery) return alcohol;
+    return alcohol.filter(a => 
+      a.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [alcohol, searchQuery]);
 
   const renderItem = ({ item }: { item: BaseItem }) => {
     const isSelected = selectedItems.includes(item.id);
@@ -87,7 +92,6 @@ const MyIngredientsAlcoholScreen = ({ navigation }: { navigation: any }) => {
             {item.name}
           </Text>
 
-          
           {hasDesc && (
             <Pressable
               onPress={() => {
@@ -110,10 +114,7 @@ const MyIngredientsAlcoholScreen = ({ navigation }: { navigation: any }) => {
                 color={theme === "dark" ? "white" : "black"}
               />
             </Pressable>
-
           )}
-
-
 
         </TouchableOpacity>
       </View>
@@ -136,9 +137,23 @@ const MyIngredientsAlcoholScreen = ({ navigation }: { navigation: any }) => {
         {t("SelectAlcoholMyIngredients")}
       </Text>
 
+      {/* DODANE: Wyszukiwarka */}
+      <View style={styles.searchContainer}>
+        <TextInput
+          style={[
+            styles.searchInput,
+            theme === "dark" ? styles.fontColorDarkMode : styles.fontColorWhiteMode
+          ]}
+          placeholder={t('SearchPlaceholder')}
+          placeholderTextColor={theme === "dark" ? 'white' : 'black'}
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+        />
+      </View>
+
       <FlatList
         style={styles.bottomSpace}
-        data={alcohol}
+        data={filteredAlcohol} // ZMIENIONE: korzysta z przefiltrowanej listy
         renderItem={renderItem}
         keyExtractor={(item) => item.id.toString()}
         extraData={selectedItems}

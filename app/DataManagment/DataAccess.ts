@@ -203,20 +203,19 @@ export async function GetDrinksBasic(lang: 'pl' | 'eng'): Promise<DrinkSimple[]>
 }
 
 export async function GetTopDrinks(
-  taste: number[],          // ID smaków
-  strength: number | null,  // ID siły alkoholu
-  alcohols: number[],       // ID alkoholi
-  ingredients: number[],    // ID składników
+  taste: number[],         
+  strength: number | null,  
+  alcohols: number[],      
+  ingredients: number[],   
   lang: "pl" | "eng"
 ): Promise<DrinkFull[]> {
   try {
     const db = await getDb(lang);
 
-    // Etap 1: pobieramy dane do liczenia punktów
     const rows: {
       drink_id: number;
       strength_id: number | null;
-      points_max: number;
+      points_max: number; 
       alcohol_id: number | null;
       ingredient_id: number | null;
       taste_id: number | null;
@@ -236,14 +235,12 @@ export async function GetTopDrinks(
       `
     );
 
-    // Grupujemy dane po drink_id
-    const grouped: Record<number, { strength_id: number | null; points_max: number; alcohols: number[]; ingredients: number[]; tastes: number[] }> = {};
+    const grouped: Record<number, { strength_id: number | null; alcohols: number[]; ingredients: number[]; tastes: number[] }> = {};
 
     for (const row of rows) {
       if (!grouped[row.drink_id]) {
         grouped[row.drink_id] = {
           strength_id: row.strength_id,
-          points_max: row.points_max,
           alcohols: [],
           ingredients: [],
           tastes: [],
@@ -260,30 +257,55 @@ export async function GetTopDrinks(
       }
     }
 
-    // Etap 2: obliczamy punkty i procent
-    const scored = Object.entries(grouped).map(([id, drink]) => {
-      let points = 0;
+    const maxPossiblePoints = 4 + (taste.length * 6) + (alcohols.length * 5);
 
-      if (drink.strength_id && drink.strength_id === strength) points += 4;
-      for (const a of drink.alcohols) if (alcohols.includes(a)) points += 2;
-      for (const t of drink.tastes) if (taste.includes(t)) points += 4;
-      for (const i of drink.ingredients) if (ingredients.includes(i)) { points = 0; break; }
+    const scored = Object.entries(grouped)
+      .map(([id, drink]) => {
+   
+        const hasExcludedIngredient = drink.ingredients.some(i => ingredients.includes(i));
+        if (hasExcludedIngredient) {
+          return null;
+        }
 
-      const percentage = Math.round((100 * points) / (drink.points_max || 1));
-      return { drink_id: Number(id), points, percentage };
-    });
+        let points = 0;
 
-    // Etap 3: sortujemy malejąco po percentage i bierzemy TOP 5
-    const top = scored.filter(d => d.points > 0).sort((a, b) => b.percentage - a.percentage).slice(0, 5);
+        if (strength === 5 || drink.strength_id === strength) {
+          points += 4;
+        }
 
-    // Etap 4: pobieramy pełne szczegóły dla TOP 5
+        for (const t of drink.tastes) {
+          if (taste.includes(t)) points += 6;
+        }
+
+        for (const a of drink.alcohols) {
+          if (alcohols.includes(a)) points += 5;
+        }
+
+        let percentage = Math.round((100 * points) / (maxPossiblePoints || 1));
+        
+        percentage = Math.min(percentage, 100);
+
+        return { drink_id: Number(id), points, percentage };
+      })
+      .filter((d): d is { drink_id: number; points: number; percentage: number } => 
+        d !== null && d.points > 0
+      );
+
+    const sortedScored = scored.sort((a, b) => b.percentage - a.percentage || b.points - a.points);
+
+    const countOver70 = sortedScored.filter(d => d.percentage > 70).length;
+
+    const limit = Math.max(5, countOver70);
+
+    const top = sortedScored.slice(0, limit);
+
     const results: DrinkFull[] = [];
     for (const t of top) {
       const full = await GetDrinkById(t.drink_id, lang);
       if (full) {
-    full.percentage = t.percentage; // 👈 przypisanie
-    results.push(full);
-  }
+        full.percentage = t.percentage; 
+        results.push(full);
+      }
     }
 
     return results;
@@ -301,7 +323,6 @@ export async function MyIngredientsGetDrinks(
   try {
     const db = await getDb(lang);
 
-    // Pobieramy wszystkie połączenia drinka z alkoholem i składnikiem
     const rows: {
       drink_id: number;
       strength_id: number | null;
@@ -322,7 +343,6 @@ export async function MyIngredientsGetDrinks(
       `
     );
 
-    // Grupujemy dane po drink_id
     const grouped: Record<number, { strength_id: number | null; points_max: number; alcohols: number[]; ingredients: number[] }> = {};
 
     for (const row of rows) {
@@ -342,7 +362,6 @@ export async function MyIngredientsGetDrinks(
       }
     }
 
-    // Obliczamy punkty i procent dopasowania
     const scored = Object.entries(grouped).map(([id, drink]) => {
       const pointsAlcohol = drink.alcohols.filter(a => selectedAlcohols.includes(a)).length;
       const pointsIngredient = drink.ingredients.filter(i => selectedIngredients.includes(i)).length;
@@ -353,16 +372,14 @@ export async function MyIngredientsGetDrinks(
       return { drink_id: Number(id), points, maxPoints, percentage };
     });
 
-    // Filtrujemy tylko te z punktami > 0 i sortujemy malejąco
     const top = scored.filter(d => d.points > 0).sort((a, b) => b.percentage - a.percentage);
 
-    // Pobieramy pełne szczegóły dla drinków
     const results: DrinkFull[] = [];
     for (const t of top) {
       const full = await GetDrinkById(t.drink_id, lang);
       if (full) {
-        full.points = t.points;       // dynamiczne pola
-        full.maxPoints = t.maxPoints; // dynamiczne pola
+        full.points = t.points;      
+        full.maxPoints = t.maxPoints; 
         full.percentage = t.percentage;
         results.push(full);
       }

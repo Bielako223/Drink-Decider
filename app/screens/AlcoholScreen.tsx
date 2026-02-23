@@ -1,5 +1,5 @@
-import React, { useState, useContext, useEffect } from 'react';
-import { FlatList, Text, TouchableOpacity, View, Pressable } from 'react-native';
+import React, { useState, useContext, useEffect, useMemo } from 'react';
+import { FlatList, Text, TouchableOpacity, View, Pressable, TextInput } from 'react-native';
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRoute, RouteProp } from "@react-navigation/native";
 import styles from '../styles';
@@ -10,27 +10,25 @@ import { ThemeContext } from "../../ThemeContext";
 import { Ionicons } from "@expo/vector-icons";
 import SimplePopup from '../SimplePopup';
 
-
-
 const AlcoholScreen = ({ navigation }: { navigation: any }) => {
   const { t } = useTranslation();
   const themeContext = useContext(ThemeContext);
   if (!themeContext) return null;
   const { theme } = themeContext;
 
-
   let route: RouteProp<{ params: { taste: number[]; strength: number } }, 'params'> = useRoute();
   const taste = route.params?.taste;
   const strength = route.params?.strength;
 
-  
   const [alcohol, setAlcohol] = useState<BaseItem[]>([]);
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
   const [popupVisible, setPopupVisible] = useState(false);
   const [popupTitle, setPopupTitle] = useState("");
   const [popupMessage, setPopupMessage] = useState("");
+  
+  // DODANE: Stan wyszukiwarki
+  const [searchQuery, setSearchQuery] = useState('');
 
- 
   useEffect(() => {
     (async () => {
       try {
@@ -51,6 +49,14 @@ const AlcoholScreen = ({ navigation }: { navigation: any }) => {
       setSelectedItems([...selectedItems, id]);
     }
   };
+
+  // DODANE: Filtrowanie alkoholi na podstawie wyszukiwania
+  const filteredAlcohol = useMemo(() => {
+    if (!searchQuery) return alcohol;
+    return alcohol.filter(a => 
+      a.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [alcohol, searchQuery]);
 
   const renderItem = ({ item }: { item: BaseItem }) => {
     const isSelected = selectedItems.includes(item.id);
@@ -114,14 +120,10 @@ const AlcoholScreen = ({ navigation }: { navigation: any }) => {
               />
             </Pressable>
           )}
-
-
-
         </TouchableOpacity>
       </View>
     );
   };
-
 
   return (
     <SafeAreaView
@@ -139,9 +141,23 @@ const AlcoholScreen = ({ navigation }: { navigation: any }) => {
         {t('SelectAlcohol')}
       </Text>
 
+      {/* DODANE: Wyszukiwarka */}
+      <View style={styles.searchContainer}>
+        <TextInput
+          style={[
+            styles.searchInput,
+            theme === "dark" ? styles.fontColorDarkMode : styles.fontColorWhiteMode
+          ]}
+          placeholder={t('SearchPlaceholder')}
+          placeholderTextColor={theme === "dark" ? 'white' : 'black'}
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+        />
+      </View>
+
       <FlatList
         style={styles.bottomSpace}
-        data={alcohol}
+        data={filteredAlcohol} // ZMIENIONE: korzysta z przefiltrowanej listy
         renderItem={renderItem}
         keyExtractor={(item) => item.id.toString()}
         extraData={selectedItems}

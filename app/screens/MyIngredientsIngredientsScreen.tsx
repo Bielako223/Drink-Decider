@@ -1,5 +1,5 @@
-import React, { useState, useContext, useEffect } from "react";
-import {FlatList,Text,TouchableOpacity,View,Pressable} from "react-native";
+import React, { useState, useContext, useEffect, useMemo } from "react";
+import {FlatList,Text,TouchableOpacity,View,Pressable, TextInput} from "react-native";
 import { useRoute, RouteProp } from "@react-navigation/native";
 import styles from "../styles";
 import { useTranslation } from "react-i18next";
@@ -9,10 +9,6 @@ import { ThemeContext } from "../../ThemeContext";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import SimplePopup from '../SimplePopup';
-
-
-
-
 
 const MyIngredientsIngredientsScreen = ({ navigation }: { navigation: any }) => {
   const { t } = useTranslation();
@@ -29,6 +25,8 @@ const MyIngredientsIngredientsScreen = ({ navigation }: { navigation: any }) => 
   const [popupTitle, setPopupTitle] = useState("");
   const [popupMessage, setPopupMessage] = useState("");
 
+  // DODANE: Stan wyszukiwarki
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     (async () => {
@@ -50,6 +48,14 @@ const MyIngredientsIngredientsScreen = ({ navigation }: { navigation: any }) => 
       setSelectedItems([...selectedItems, id]);
     }
   };
+
+  // DODANE: Filtrowanie składników na podstawie wyszukiwania
+  const filteredIngredients = useMemo(() => {
+    if (!searchQuery) return ingredients;
+    return ingredients.filter(i => 
+      i.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [ingredients, searchQuery]);
 
   const renderItem = ({ item }: { item: BaseItem }) => {
     const isSelected = selectedItems.includes(item.id);
@@ -135,9 +141,23 @@ const MyIngredientsIngredientsScreen = ({ navigation }: { navigation: any }) => 
         {t("SelectIngrednientsMyIngredients")}
       </Text>
 
+      {/* DODANE: Wyszukiwarka */}
+      <View style={styles.searchContainer}>
+        <TextInput
+          style={[
+            styles.searchInput,
+            theme === "dark" ? styles.fontColorDarkMode : styles.fontColorWhiteMode
+          ]}
+          placeholder={t('SearchPlaceholder')}
+          placeholderTextColor={theme === "dark" ? 'white' : 'black'}
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+        />
+      </View>
+
       <FlatList
         style={styles.bottomSpace}
-        data={ingredients}
+        data={filteredIngredients} // ZMIENIONE: korzysta z przefiltrowanej listy
         renderItem={renderItem}
         keyExtractor={(item) => item.id.toString()}
         extraData={selectedItems}

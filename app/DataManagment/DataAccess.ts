@@ -287,8 +287,7 @@ export async function GetTopDrinks(
         // Obliczanie procentowe
         let percentage = Math.round((100 * points) / (drinkMaxPoints || 1));
         
-        // Zabezpieczenie przed przekroczeniem 100% (np. przez punkty z alkoholi)
-        //percentage = Math.min(percentage, 100);
+        if (percentage > 100) percentage = 100; // Ograniczenie do 100%
 
         return { drink_id: Number(id), points, percentage };
       })

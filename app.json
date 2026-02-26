@@ -2,7 +2,7 @@
   "expo": {
     "name": "DrinkDecider",
     "slug": "Drink-Decider",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/icon1.png",
     "userInterfaceStyle": "light",
@@ -16,6 +16,7 @@
       "bundleIdentifier": "com.bielako223.DrinkDecider"
     },
     "android": {
+      "versionCode": 7,
       "adaptiveIcon": {
         "foregroundImage": "./assets/icon1.png",
         "backgroundColor": "#E8F8F5"

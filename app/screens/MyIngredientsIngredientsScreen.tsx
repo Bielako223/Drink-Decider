@@ -1,5 +1,5 @@
-import React, { useState, useContext, useEffect, useMemo } from "react";
-import {FlatList,Text,TouchableOpacity,View,Pressable, TextInput} from "react-native";
+import React, { useState, useContext, useEffect, useMemo, useCallback } from "react";
+import { FlatList, Text, TouchableOpacity, View, Pressable, TextInput } from "react-native";
 import { useRoute, RouteProp } from "@react-navigation/native";
 import styles from "../styles";
 import { useTranslation } from "react-i18next";
@@ -21,11 +21,10 @@ const MyIngredientsIngredientsScreen = ({ navigation }: { navigation: any }) => 
 
   const [ingredients, setIngredients] = useState<BaseItem[]>([]);
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
-  const [popupVisible, setPopupVisible] = useState(false);
-  const [popupTitle, setPopupTitle] = useState("");
-  const [popupMessage, setPopupMessage] = useState("");
+  
+  // OPTYMALIZACJA: Jeden złączony stan popupu
+  const [popupConfig, setPopupConfig] = useState({ visible: false, title: "", message: "" });
 
-  // DODANE: Stan wyszukiwarki
   const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
@@ -41,23 +40,22 @@ const MyIngredientsIngredientsScreen = ({ navigation }: { navigation: any }) => 
     })();
   }, [t]);
 
-  const handleSelect = (id: number) => {
-    if (selectedItems.includes(id)) {
-      setSelectedItems(selectedItems.filter((item) => item !== id));
-    } else {
-      setSelectedItems([...selectedItems, id]);
-    }
-  };
+  // OPTYMALIZACJA: useCallback i aktualizacja funkcyjna
+  const handleSelect = useCallback((id: number) => {
+    setSelectedItems((prev) =>
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+    );
+  }, []);
 
-  // DODANE: Filtrowanie składników na podstawie wyszukiwania
+  // OPTYMALIZACJA: toLowerCase zrobione raz, przed wejściem w pętlę
   const filteredIngredients = useMemo(() => {
     if (!searchQuery) return ingredients;
-    return ingredients.filter(i => 
-      i.name.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    const lowerQuery = searchQuery.toLowerCase();
+    return ingredients.filter(i => i.name.toLowerCase().includes(lowerQuery));
   }, [ingredients, searchQuery]);
 
-  const renderItem = ({ item }: { item: BaseItem }) => {
+  // OPTYMALIZACJA: renderItem owinięty w useCallback
+  const renderItem = useCallback(({ item }: { item: BaseItem }) => {
     const isSelected = selectedItems.includes(item.id);
 
     return (
@@ -98,11 +96,7 @@ const MyIngredientsIngredientsScreen = ({ navigation }: { navigation: any }) => 
 
           {item.desc && (
             <Pressable
-              onPress={() => {
-                setPopupTitle(item.name);        
-                setPopupMessage(item.desc ?? "");  
-                setPopupVisible(true);
-              }}
+              onPress={() => setPopupConfig({ visible: true, title: item.name, message: item.desc ?? "" })}
               style={{
                 marginLeft: 8,
                 backgroundColor: theme === "dark" ? "#444" : "#e0e0e0",
@@ -118,12 +112,11 @@ const MyIngredientsIngredientsScreen = ({ navigation }: { navigation: any }) => 
                 color={theme === "dark" ? "white" : "black"}
               />
             </Pressable>
-
           )}
         </TouchableOpacity>
       </View>
     );
-  };
+  }, [selectedItems, theme, handleSelect]);
 
   return (
     <SafeAreaView
@@ -141,7 +134,6 @@ const MyIngredientsIngredientsScreen = ({ navigation }: { navigation: any }) => 
         {t("SelectIngrednientsMyIngredients")}
       </Text>
 
-      {/* DODANE: Wyszukiwarka */}
       <View style={styles.searchContainer}>
         <TextInput
           style={[
@@ -157,10 +149,14 @@ const MyIngredientsIngredientsScreen = ({ navigation }: { navigation: any }) => 
 
       <FlatList
         style={styles.bottomSpace}
-        data={filteredIngredients} // ZMIENIONE: korzysta z przefiltrowanej listy
+        data={filteredIngredients} 
         renderItem={renderItem}
         keyExtractor={(item) => item.id.toString()}
         extraData={selectedItems}
+        // OPTYMALIZACJA: Flagi wydajnościowe FlatList
+        initialNumToRender={12}
+        windowSize={5}
+        maxToRenderPerBatch={10}
       />
 
       <View>
@@ -195,11 +191,12 @@ const MyIngredientsIngredientsScreen = ({ navigation }: { navigation: any }) => 
           <Text style={[theme === "dark" ? styles.buttonText : styles.buttonTextWhiteMode]}>{t("ButtonTextNext")}</Text>
         </Pressable>
       </View>
+      
       <SimplePopup
-        isVisible={popupVisible}
-        onClose={() => setPopupVisible(false)}
-        title={popupTitle}
-        message={popupMessage}
+        isVisible={popupConfig.visible}
+        onClose={() => setPopupConfig(prev => ({ ...prev, visible: false }))}
+        title={popupConfig.title}
+        message={popupConfig.message}
       />
 
     </SafeAreaView>

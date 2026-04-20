@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useContext } from "react";
-import { Text, View, ScrollView, Pressable } from "react-native";
+import React, { useState, useEffect, useContext, useCallback, useMemo } from "react";
+import { Text, View, Pressable, FlatList } from "react-native";
 import { useRoute, RouteProp } from "@react-navigation/native";
 import styles from "../styles";
 import { useTranslation } from "react-i18next";
@@ -10,21 +10,25 @@ import DrinkItem from "../DrinkItem";
 import DrinkItemSimple from "../DrinkItemSimple";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-
 function MyIngredientsResutScreen({ navigation }: { navigation: any }) {
   const { t } = useTranslation();
   const themeContext = useContext(ThemeContext);
   if (!themeContext) return null;
   const { theme } = themeContext;
 
-  let route: RouteProp<{ params: { alcohols: string[]; ingredients: string[] } }, "params"> = useRoute();
+  // OPTYMALIZACJA: Poprawiony typ na number[], zgodnie z tym co wysyłają poprzednie ekrany
+  let route: RouteProp<{ params: { alcohols: number[]; ingredients: number[] } }, "params"> = useRoute();
 
-  const alcohols = React.useMemo(() => (route.params?.alcohols ?? []).map(id => Number(id)), [route.params?.alcohols]);
-  const ingredients = React.useMemo(() => (route.params?.ingredients ?? []).map(id => Number(id)), [route.params?.ingredients]);
+  const alcohols = route.params?.alcohols ?? [];
+  const ingredients = route.params?.ingredients ?? [];
 
   const [drinks, setDrinks] = useState<DrinkFull[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeIndex, setActiveIndex] = useState<number>(0);
+
+  // OPTYMALIZACJA: Zmieniamy tablice na proste stringi, żeby useEffect nie głupiał przy porównywaniu
+  const alcoholsKey = useMemo(() => alcohols.join(','), [alcohols]);
+  const ingredientsKey = useMemo(() => ingredients.join(','), [ingredients]);
 
   useEffect(() => {
     let isMounted = true; 
@@ -47,61 +51,85 @@ function MyIngredientsResutScreen({ navigation }: { navigation: any }) {
     return () => {
       isMounted = false;
     };
-  }, [alcohols, ingredients, t]);
+  }, [alcoholsKey, ingredientsKey, t]); // Bezpieczne zależności
 
-  const handlePress = (index: number) => {
+  // OPTYMALIZACJA: useCallback dla obsługi kliknięć
+  const handlePress = useCallback((index: number) => {
     setActiveIndex(prev => (prev === index ? -1 : index));
-  };
+  }, []);
+
+  // OPTYMALIZACJA: Renderowanie pojedynczego elementu (wyciągnięte z FlatList)
+  const renderItem = useCallback(({ item, index }: { item: DrinkFull, index: number }) => {
+    const isActive = activeIndex === index;
+    
+    if (isActive) {
+      return (
+        <DrinkItem
+          drink={item}
+          matchPercentage={item.percentage}
+          points={item.points}
+          maxPoints={item.maxPoints}
+          onPress={() => handlePress(index)}
+        />
+      );
+    }
+    
+    return (
+      <DrinkItemSimple
+        drink={item}
+        matchPercentage={item.percentage}
+        points={item.points}
+        maxPoints={item.maxPoints}
+        onPress={() => handlePress(index)}
+      />
+    );
+  }, [activeIndex, handlePress]);
+
+  // NAGŁÓWEK LISTY
+  const renderHeader = () => (
+    <Text style={[styles.topText, theme === "dark" ? styles.fontColorDarkMode : styles.fontColorWhiteMode]}>
+      {t("drinksfromyoursingredients")}
+    </Text>
+  );
+
+  // STOPKA LISTY
+  const renderFooter = () => (
+    <View style={styles.finalDrinkbuttonContainer}>
+      <Pressable
+        style={[styles.startButton, theme === "dark" ? styles.bottomButtonDarkMode : styles.buttonWhiteMode]}
+        onPress={() => navigation.navigate("Main")}
+      >
+        <Text style={[theme === "dark" ? styles.buttonText : styles.buttonTextWhiteMode]}>{t("DrinkTryAgain")}</Text>
+      </Pressable>
+    </View>
+  );
 
   return (
     <SafeAreaView style={[styles.container, theme === "dark" ? styles.bgColorDarkMode : styles.bgColorWhiteMode]}>
-      <ScrollView>
-        {loading ? (
-          <Text style={styles.noDrinksText}>{t("Loading")}...</Text>
-        ) : drinks.length === 0 ? (
+      {loading ? (
+        <Text style={styles.noDrinksText}>{t("Loading")}...</Text>
+      ) : drinks.length === 0 ? (
+        <View>
           <Text style={styles.noDrinksText}>{t("MyIngrednietsNoneMessage")}</Text>
-        ) : (
-          <View>
-            <Text style={[styles.topText, theme === "dark" ? styles.fontColorDarkMode : styles.fontColorWhiteMode]}>
-              {t("drinksfromyoursingredients")}
-            </Text>
-
-            {drinks.map((drink, index) =>
-              activeIndex === index ? (
-                <DrinkItem
-                  key={drink.id}
-                  drink={drink}
-                  matchPercentage={drink.percentage}
-                  points={drink.points}
-                  maxPoints={drink.maxPoints}
-                  onPress={() => handlePress(index)}
-                />
-              ) : (
-                <DrinkItemSimple
-                  key={drink.id}
-                  drink={drink}
-                  matchPercentage={drink.percentage}
-                  points={drink.points}
-                  maxPoints={drink.maxPoints}
-                  onPress={() => handlePress(index)}
-                />
-              )
-            )}
-          </View>
-        )}
-
-        <View style={styles.finalDrinkbuttonContainer}>
-          <Pressable
-            style={[styles.startButton, theme === "dark" ? styles.bottomButtonDarkMode : styles.buttonWhiteMode]}
-            onPress={() => navigation.navigate("Main")}
-          >
-            <Text style={[theme === "dark" ? styles.buttonText : styles.buttonTextWhiteMode]}>{t("DrinkTryAgain")}</Text>
-          </Pressable>
+          {renderFooter()}
         </View>
-      </ScrollView>
+      ) : (
+        // OPTYMALIZACJA: FlatList zamiast ScrollView
+        <FlatList
+          data={drinks}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={renderItem}
+          extraData={activeIndex}
+          ListHeaderComponent={renderHeader}
+          ListFooterComponent={renderFooter}
+          initialNumToRender={5}
+          windowSize={5}
+          maxToRenderPerBatch={5}
+          contentContainerStyle={{ paddingBottom: 20 }}
+        />
+      )}
     </SafeAreaView>
   );
 }
-
 
 export default MyIngredientsResutScreen;

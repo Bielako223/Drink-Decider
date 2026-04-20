@@ -26,9 +26,13 @@ function DrinkListScreen({ navigation }: { navigation: any }) {
 
   useEffect(() => {
     (async () => {
-      const lang = t('Lang') === 'pl' ? 'pl' : 'eng';
-      const data = await GetDrinksBasic(lang);
-      setDrinks(data.map(d => new DrinkSimple(d.id, d.name, d.img ?? '', d.range ?? '')));
+      try {
+        const lang = t('Lang') === 'pl' ? 'pl' : 'eng';
+        const data = await GetDrinksBasic(lang);
+        setDrinks(data.map(d => new DrinkSimple(d.id, d.name, d.img ?? '', d.range ?? '')));
+      } catch (err) {
+        console.error("Błąd przy pobieraniu listy drinków:", err);
+      }
     })();
   }, [t]);
 
@@ -46,17 +50,28 @@ function DrinkListScreen({ navigation }: { navigation: any }) {
     }
   }, [activeDrinkId, t]);
 
-  const filteredDrinks = useMemo(() =>
-    drinks.filter(d =>
+  // OPTYMALIZACJA: toLowerCase zrobione RAZ przed wejściem w pętlę filtrującą
+  const filteredDrinks = useMemo(() => {
+    const query = searchQuery.toLowerCase();
+    return drinks.filter(d =>
       (showFavorites ? favoriteIds.includes(d.id) : true) &&
-      d.name.toLowerCase().includes(searchQuery.toLowerCase())
-    ),
-    [drinks, searchQuery, showFavorites, favoriteIds]
-  );
+      d.name.toLowerCase().includes(query)
+    );
+  }, [drinks, searchQuery, showFavorites, favoriteIds]);
 
-  const getItemLayout = useCallback((data: DrinkSimple[] | null | undefined, index: number) => (
-    { length: 100, offset: 100 * index, index }
-  ), []);
+  // OPTYMALIZACJA: renderItem wydzielony do useCallback
+  const renderItem = useCallback(({ item }: { item: DrinkSimple }) => {
+    const isActive = activeDrinkId === item.id;
+    
+    if (isActive && activeDrink) {
+      return <DrinkItem drink={activeDrink} onPress={() => handlePress(item)} />;
+    }
+    
+    return <DrinkItemSimple drink={item} onPress={() => handlePress(item)} />;
+  }, [activeDrinkId, activeDrink, handlePress]);
+
+  // USUNIĘTO: getItemLayout - jeśli elementy rozwijają się po kliknięciu i zmieniają 
+  // swoją wysokość, narzucanie im stałej wysokości (100) psuje system wirtualizacji FlatList!
 
   return (
     <SafeAreaView
@@ -98,13 +113,11 @@ function DrinkListScreen({ navigation }: { navigation: any }) {
         data={filteredDrinks}
         extraData={activeDrinkId} 
         keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item }) =>
-          activeDrinkId === item.id && activeDrink ? (
-            <DrinkItem drink={activeDrink} onPress={() => handlePress(item)} />
-          ) : (
-            <DrinkItemSimple drink={item} onPress={() => handlePress(item)} />
-          )
-        }
+        renderItem={renderItem}
+        // DODANO: Flagi wydajnościowe FlatList
+        initialNumToRender={10}
+        windowSize={5}
+        maxToRenderPerBatch={10}
         contentContainerStyle={{ paddingBottom: 100 }}
       />
 

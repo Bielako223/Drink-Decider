@@ -17,20 +17,21 @@ import WelcomeScreen from './app/screens/MyIngredientsInstruction';
 import { I18nextProvider } from 'react-i18next';
 import i18next from './services/i18next';
 import { ThemeProvider, ThemeContext } from "./ThemeContext";
-// ZMIENIONE: Dodany useEffect
-import React, { useContext, useEffect } from 'react'; 
+// ZMIENIONE: Dodany useState do kontrolowania ładowania
+import React, { useContext, useEffect, useState } from 'react'; 
 import { useFonts, Poppins_400Regular, Poppins_700Bold, Poppins_500Medium } from '@expo-google-fonts/poppins';
 import { FavoriteProvider } from './app/FavoriteContext';
-
-// DODANE: Import AsyncStorage
 import AsyncStorage from '@react-native-async-storage/async-storage'; 
+import { checkAndUpgradeDatabases } from './app/DataManagment/dbInit';
 
 const Stack = createNativeStackNavigator();
 
 function AppContent() {
   const themeContext = useContext(ThemeContext);
   if (!themeContext) return null;
-
+  
+  // USUNIĘTO: resetDatabases() z tego miejsca!
+  
   const { theme } = themeContext;
   return (
     <>
@@ -64,25 +65,32 @@ export default function App() {
     Poppins_500Medium
   });
 
-  // DODANE: useEffect, który ładuje język przy starcie
+ 
+  const [appReady, setAppReady] = useState(false);
+
   useEffect(() => {
-    const loadLanguage = async () => {
+    const prepareApp = async () => {
       try {
         const savedLanguage = await AsyncStorage.getItem('user-language');
         if (savedLanguage) {
-          i18next.changeLanguage(savedLanguage);
+          await i18next.changeLanguage(savedLanguage);
         }
+
+        await checkAndUpgradeDatabases();
+
       } catch (error) {
-        console.error('Błąd podczas odczytywania języka:', error);
+        console.error('Błąd podczas inicjalizacji aplikacji:', error);
+      } finally {
+        setAppReady(true);
       }
     };
 
-    loadLanguage();
+    prepareApp();
   }, []);
 
-  // Opcjonalnie: możesz zablokować renderowanie, dopóki fonty się nie załadują
-  if (!fontsLoaded) {
-    return null; // Lub twój Splash Screen
+
+  if (!fontsLoaded || !appReady) {
+    return null; 
   }
 
   return (

@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect, useMemo } from 'react';
+import React, { useState, useContext, useEffect, useMemo, useCallback } from 'react';
 import { FlatList, Text, TouchableOpacity, View, Pressable, TextInput } from 'react-native';
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRoute, RouteProp } from "@react-navigation/native";
@@ -22,11 +22,10 @@ const AlcoholScreen = ({ navigation }: { navigation: any }) => {
 
   const [alcohol, setAlcohol] = useState<BaseItem[]>([]);
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
-  const [popupVisible, setPopupVisible] = useState(false);
-  const [popupTitle, setPopupTitle] = useState("");
-  const [popupMessage, setPopupMessage] = useState("");
   
-  // DODANE: Stan wyszukiwarki
+  // Zoptymalizowane: Połączony stan popupu (mniej przerenderowań przy otwieraniu)
+  const [popupConfig, setPopupConfig] = useState({ visible: false, title: "", message: "" });
+  
   const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
@@ -42,25 +41,25 @@ const AlcoholScreen = ({ navigation }: { navigation: any }) => {
     })();
   }, [t]);
 
-  const handleSelect = (id: number) => {
-    if (selectedItems.includes(id)) {
-      setSelectedItems(selectedItems.filter(item => item !== id));
-    } else {
-      setSelectedItems([...selectedItems, id]);
-    }
-  };
+  // OPTYMALIZACJA 1: useCallback + funkcyjna aktualizacja stanu
+  const handleSelect = useCallback((id: number) => {
+    setSelectedItems(prev => 
+      prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]
+    );
+  }, []); // pusta tablica zależności! Funkcja nie zmienia się nigdy.
 
-  // DODANE: Filtrowanie alkoholi na podstawie wyszukiwania
+  // OPTYMALIZACJA 2: Wyciągnięcie .toLowerCase() poza pętlę
   const filteredAlcohol = useMemo(() => {
     if (!searchQuery) return alcohol;
-    return alcohol.filter(a => 
-      a.name.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    const lowerQuery = searchQuery.toLowerCase();
+    return alcohol.filter(a => a.name.toLowerCase().includes(lowerQuery));
   }, [alcohol, searchQuery]);
 
-  const renderItem = ({ item }: { item: BaseItem }) => {
+  // OPTYMALIZACJA 3: useCallback dla renderItem
+  const renderItem = useCallback(({ item }: { item: BaseItem }) => {
     const isSelected = selectedItems.includes(item.id);
     const hasDesc = item.desc && item.desc !== "";
+    
     return (
       <View
         style={{
@@ -99,11 +98,7 @@ const AlcoholScreen = ({ navigation }: { navigation: any }) => {
 
           {hasDesc && (
             <Pressable
-              onPress={() => {
-                setPopupTitle(item.name);        
-                setPopupMessage(item.desc ?? ""); 
-                setPopupVisible(true);
-              }}
+              onPress={() => setPopupConfig({ visible: true, title: item.name, message: item.desc ?? "" })}
               style={{
                 marginLeft: 8,
                 backgroundColor: theme === "dark" ? "#444" : "#e0e0e0",
@@ -123,7 +118,7 @@ const AlcoholScreen = ({ navigation }: { navigation: any }) => {
         </TouchableOpacity>
       </View>
     );
-  };
+  }, [selectedItems, theme, handleSelect]); // zależne tylko od tego, co realnie wpływa na wygląd elementu
 
   return (
     <SafeAreaView
@@ -141,7 +136,6 @@ const AlcoholScreen = ({ navigation }: { navigation: any }) => {
         {t('SelectAlcohol')}
       </Text>
 
-      {/* DODANE: Wyszukiwarka */}
       <View style={styles.searchContainer}>
         <TextInput
           style={[
@@ -157,10 +151,14 @@ const AlcoholScreen = ({ navigation }: { navigation: any }) => {
 
       <FlatList
         style={styles.bottomSpace}
-        data={filteredAlcohol} // ZMIENIONE: korzysta z przefiltrowanej listy
+        data={filteredAlcohol}
         renderItem={renderItem}
         keyExtractor={(item) => item.id.toString()}
         extraData={selectedItems}
+        // DODATKOWA OPTYMALIZACJA FLATLIST:
+        initialNumToRender={10} 
+        windowSize={5}
+        maxToRenderPerBatch={10}
       />
 
       <View>
@@ -190,11 +188,12 @@ const AlcoholScreen = ({ navigation }: { navigation: any }) => {
           <Text style={[theme === "dark" ? styles.buttonText : styles.buttonTextWhiteMode]}>{t('ButtonTextNext')}</Text>
         </Pressable>
       </View>
+      
       <SimplePopup
-        isVisible={popupVisible}
-        onClose={() => setPopupVisible(false)}
-        title={popupTitle}
-        message={popupMessage}
+        isVisible={popupConfig.visible}
+        onClose={() => setPopupConfig(prev => ({ ...prev, visible: false }))}
+        title={popupConfig.title}
+        message={popupConfig.message}
       />
     </SafeAreaView>
   );

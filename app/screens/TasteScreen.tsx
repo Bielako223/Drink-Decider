@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useContext, useEffect, useCallback } from "react";
 import { FlatList, Text, TouchableOpacity, View, Pressable } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import styles from "../styles";
@@ -6,7 +6,6 @@ import { useTranslation } from "react-i18next";
 import { BaseItem } from "../DataManagment/Classes";
 import { GetTaste } from "../DataManagment/DataAccess";
 import { ThemeContext } from "../../ThemeContext";
-import SimplePopup from "../SimplePopup";
 
 const TasteScreen = ({ navigation }: { navigation: any }) => {
   const { t } = useTranslation();
@@ -16,9 +15,6 @@ const TasteScreen = ({ navigation }: { navigation: any }) => {
 
   const [taste, setTaste] = useState<BaseItem[]>([]);
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
-  const [popupVisible, setPopupVisible] = useState(false);
-  const [popupTitle, setPopupTitle] = useState(t('Warning'));
-  const [popupMessage, setPopupMessage] = useState("");
 
   useEffect(() => {
     (async () => {
@@ -32,19 +28,15 @@ const TasteScreen = ({ navigation }: { navigation: any }) => {
     })();
   }, [t]);
 
-  const handleSelect = (id: number) => {
-    if (selectedItems.includes(id)) {
-      setSelectedItems(selectedItems.filter(item => item !== id));
-    } else if (selectedItems.length < 2) {
-      setSelectedItems([...selectedItems, id]);
-    } else {
-      setPopupTitle(t("Warning")); 
-      setPopupMessage(t("SelectTasteAlert")); 
-      setPopupVisible(true);
-    }
-  };
+  // OPTYMALIZACJA: useCallback i aktualizacja funkcyjna stanu
+  const handleSelect = useCallback((id: number) => {
+    setSelectedItems((prev) =>
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+    );
+  }, []);
 
-  const renderItem = ({ item }: { item: BaseItem }) => {
+  // OPTYMALIZACJA: renderItem wewnątrz useCallback
+  const renderItem = useCallback(({ item }: { item: BaseItem }) => {
     const isSelected = selectedItems.includes(item.id);
     return (
       <View style={{ marginHorizontal: 16 }}>
@@ -53,7 +45,10 @@ const TasteScreen = ({ navigation }: { navigation: any }) => {
           style={[
             styles.item,
             theme === "dark" ? styles.buttonDarkMode : styles.buttonWhiteMode,
-            isSelected && (theme === "dark" ? styles.bgButtonSelectedColorDarkMode : styles.bgbuttonSelectedColorWhiteMode)
+            isSelected &&
+            (theme === "dark"
+              ? styles.bgButtonSelectedColorDarkMode
+              : styles.bgbuttonSelectedColorWhiteMode),
           ]}
         >
           <Text style={[styles.itemText, theme === "dark" ? styles.fontColorDarkMode : styles.fontColorWhiteMode]}>
@@ -62,7 +57,7 @@ const TasteScreen = ({ navigation }: { navigation: any }) => {
         </TouchableOpacity>
       </View>
     );
-  };
+  }, [selectedItems, theme, handleSelect]); // Re-render nastąpi tylko wtedy, gdy zmieni się zaznaczenie, motyw lub funkcja
 
   return (
     <SafeAreaView style={[styles.container, theme === "dark" ? styles.bgColorDarkMode : styles.bgColorWhiteMode]}>
@@ -76,6 +71,10 @@ const TasteScreen = ({ navigation }: { navigation: any }) => {
         renderItem={renderItem}
         keyExtractor={item => item.id.toString()}
         extraData={selectedItems}
+        // OPTYMALIZACJA: Profilaktyczne flagi wydajnościowe FlatList
+        initialNumToRender={8}
+        windowSize={5}
+        maxToRenderPerBatch={10}
       />
 
       <View>
@@ -98,12 +97,6 @@ const TasteScreen = ({ navigation }: { navigation: any }) => {
           <Text style={theme === "dark" ? styles.buttonText : styles.buttonTextWhiteMode}>{t("ButtonTextNext")}</Text>
         </Pressable>
       </View>
-      <SimplePopup
-        isVisible={popupVisible}
-        onClose={() => setPopupVisible(false)}
-        title={popupTitle}
-        message={popupMessage}
-      />
     </SafeAreaView>
   );
 };

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useCallback } from 'react';
 import { ScrollView, Text, Pressable, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import styles from '../styles';
@@ -8,7 +8,6 @@ import { GetRandomDrink } from '../DataManagment/DataAccess';
 import { DrinkFull } from '../DataManagment/Classes';
 import { SafeAreaView } from "react-native-safe-area-context";
 
-
 function RandomDrinkScreen({ navigation }: { navigation: any }) {
   const { t } = useTranslation();
   const themeContext = useContext(ThemeContext);
@@ -16,21 +15,59 @@ function RandomDrinkScreen({ navigation }: { navigation: any }) {
   const { theme } = themeContext;
 
   const [randomDrink, setRandomDrink] = useState<DrinkFull | null>(null);
+  
+  // Opcjonalnie: dedykowany stan ładowania jest lepszą praktyką niż sprawdzanie samego null
+  const [isLoading, setIsLoading] = useState(true);
 
-  const loadRandomDrink = async () => {
-    setRandomDrink(null); 
-    const drink = await GetRandomDrink(t('Lang') === 'pl' ? 'pl' : 'eng');
-    setRandomDrink(drink);
-  };
+  // OPTYMALIZACJA: useCallback
+  const loadRandomDrink = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const lang = t('Lang') === 'pl' ? 'pl' : 'eng';
+      const drink = await GetRandomDrink(lang);
+      setRandomDrink(drink);
+    } catch (error) {
+      console.error("Błąd przy losowaniu drinka:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [t]);
 
   useEffect(() => {
-    loadRandomDrink();
-  }, []);
+    // OPTYMALIZACJA: Zabezpieczenie przed aktualizacją odmontowanego komponentu
+    let isMounted = true;
 
-  if (!randomDrink) {
+    const initLoad = async () => {
+      setIsLoading(true);
+      try {
+        const lang = t('Lang') === 'pl' ? 'pl' : 'eng';
+        const drink = await GetRandomDrink(lang);
+        if (isMounted) {
+          setRandomDrink(drink);
+        }
+      } catch (error) {
+        console.error("Błąd przy losowaniu drinka:", error);
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    initLoad();
+
+    // Cleanup function - uruchomi się, gdy użytkownik wyjdzie z ekranu
+    return () => {
+      isMounted = false;
+    };
+  }, [t]);
+
+  if (isLoading || !randomDrink) {
     return (
       <SafeAreaView style={[styles.container, theme === "dark" ? styles.bgColorDarkMode : styles.bgColorWhiteMode]}>
-        <Text style={styles.topText}>{t('Loading')}...</Text>
+        <Text style={[styles.topText, theme === "dark" ? styles.fontColorDarkMode : styles.fontColorWhiteMode]}>
+          {t('Loading')}...
+        </Text>
       </SafeAreaView>
     );
   }
@@ -47,7 +84,7 @@ function RandomDrinkScreen({ navigation }: { navigation: any }) {
         <View style={styles.finalDrinkbuttonContainer}>
           <Pressable
             style={[styles.startButton, theme === "dark" ? styles.buttonDarkMode : styles.buttonWhiteMode, { marginBottom: 15 }]}
-            onPress={loadRandomDrink}
+            onPress={loadRandomDrink} // Podpięcie naszej funkcji z useCallback
           >
             <Text style={[theme === "dark" ? styles.buttonText : styles.buttonTextWhiteMode]}>{t('RandomDrinkTryAgain')}</Text>
           </Pressable>

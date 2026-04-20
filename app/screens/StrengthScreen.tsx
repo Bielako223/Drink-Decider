@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useContext, useEffect, useCallback } from "react";
 import { FlatList, Text, TouchableOpacity, Pressable, View } from "react-native";
 import { useRoute, RouteProp } from "@react-navigation/native";
 import styles from "../styles";
@@ -33,11 +33,13 @@ const StrengthScreen = ({ navigation }: { navigation: any }) => {
     })();
   }, [t]);
 
-  const handleSelect = (id: number) => {
-    setSelectedItem(id === selectedItem ? null : id);
-  };
+  // OPTYMALIZACJA: useCallback + funkcyjna aktualizacja stanu
+  const handleSelect = useCallback((id: number) => {
+    setSelectedItem((prev) => (prev === id ? null : id));
+  }, []);
 
-  const renderItem = ({ item }: { item: BaseItem }) => {
+  // OPTYMALIZACJA: useCallback dla renderowania elementu
+  const renderItem = useCallback(({ item }: { item: BaseItem }) => {
     const isSelected = item.id === selectedItem;
     return (
       <View style={{ marginHorizontal: 16 }}>
@@ -52,11 +54,13 @@ const StrengthScreen = ({ navigation }: { navigation: any }) => {
               : styles.bgbuttonSelectedColorWhiteMode),
           ]}
         >
-          <Text style={[styles.itemText, theme === "dark" ? styles.fontColorDarkMode : styles.fontColorWhiteMode]}>{item.name}</Text>
+          <Text style={[styles.itemText, theme === "dark" ? styles.fontColorDarkMode : styles.fontColorWhiteMode]}>
+            {item.name}
+          </Text>
         </TouchableOpacity>
       </View>
     );
-  };
+  }, [selectedItem, theme, handleSelect]); // Zależności, które decydują o wyglądzie
 
   return (
     <SafeAreaView
@@ -79,6 +83,10 @@ const StrengthScreen = ({ navigation }: { navigation: any }) => {
         renderItem={renderItem}
         keyExtractor={(item) => item.id.toString()}
         extraData={selectedItem}
+        // Ze względu na krótką listę optymalizacje pamięciowe (windowSize itp.)
+        // nie są tu konieczne, ale dodanie tych poniżej to dobry nawyk
+        initialNumToRender={5}
+        contentContainerStyle={{ paddingBottom: 20 }}
       />
 
       <View>

@@ -1,7 +1,12 @@
 # DrinkDecider 🍹
-<a href="https://play.google.com/store/apps/details?id=com.bielako223.DrinkDecider&hl=en" target="_blank">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" alt="Drink Decider">
-</a>
+<div style="display: flex; gap: 10px; align-items: center;">
+    <a href="https://play.google.com/store/apps/details?id=com.bielako223.DrinkDecider&hl=en" target="_blank">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" alt="Google Play" style="height: 50px; width: auto;">
+    </a>
+    <a href="https://apps.apple.com/us/app/drink-decider/id6762869173" target="_blank">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Download_on_the_App_Store_Badge.svg" alt="App Store" style="height: 50px; width: auto;">
+    </a>
+</div>
 
 DrinkDecider is a mobile application that helps you discover and create amazing drinks based on your preferences and available ingredients. Whether you're hosting a party, experimenting with mixology, or just looking for something new, DrinkDecider has you covered!
 # Features 📱
